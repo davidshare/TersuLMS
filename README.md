@@ -6,8 +6,9 @@ A learning management system
 `uvicorn src.main:app --reload`
 
 ## Run migrations
-`alembic revision --autogenerate -m "<description of migration>"` <!-- Create the migration -->
-`alembic upgrade head` <!-- update the database -->
+`alembic revision --autogenerate -m "<description of migration>"`  # Create the migration
+
+`alembic upgrade head` # update the database
 
 ## Important urls
 ### FastAPI documentation
