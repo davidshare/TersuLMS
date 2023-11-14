@@ -1,8 +1,16 @@
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Boolean, DateTime, Table
 from sqlalchemy.orm import relationship
 
 from ..config.database import Base
+
+# Association Table for Many-to-Many relationship between UserRoles and Permissions
+granted_permissions = Table(
+    'granted_permissions',
+    Base.metadata,
+    Column('role_id', ForeignKey('user_roles.id'), primary_key=True),
+    Column('permissions_id', ForeignKey('user_permissions.id'), primary_key=True)
+)
 
 
 class HashingAlgorithm(Base):
@@ -54,3 +62,15 @@ class EmailVerification(Base):
     expired_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow() + timedelta(minutes=15))
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     user_login = relationship("UserLogin")
+
+class UserRole(Base):
+    __tablename__ = 'user_roles'
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    description = Column(String(255))
+
+class UserPermissions(Base):
+    __tablename__ = 'user_permissions'
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    description = Column(String(255))
