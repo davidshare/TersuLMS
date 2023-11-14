@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 
 from ..config.database import Base
 
-# Association Table for Many-to-Many relationship between UserRoles and Permissions
 granted_permissions = Table(
     'granted_permissions',
     Base.metadata,
@@ -18,6 +17,7 @@ class HashingAlgorithm(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     algorithm_name = Column(String(10))
+    
 
 class ExternalProvider(Base):
     __tablename__ = 'external_providers'
@@ -36,6 +36,7 @@ class UserLogin(Base):
     hash_algorithm_id = Column(Integer, ForeignKey('hashing_algorithms.id'))
     email = Column(String(100))
     is_active = Column(Boolean, default=False)
+    is_email_verified = Column(Boolean, default=False)
     password_recovery_token = Column(String(100))
     recovery_token_time = Column(Date)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
