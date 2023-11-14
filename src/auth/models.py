@@ -11,12 +11,18 @@ class HashingAlgorithm(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     algorithm_name = Column(String(10))
 
+class ExternalProvider(Base):
+    __tablename__ = 'external_providers'
 
-class UserLoginData(Base):
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    provider_name = Column(String(50))
+    web_service_endpoint = Column(String(200))
+
+
+class UserLogin(Base):
     __tablename__ = 'user_login'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    login_name = Column(String(20))
     password_hash = Column(String(250))
     password_salt = Column(String(100))
     hash_algorithm_id = Column(Integer, ForeignKey('hashing_algorithms.id'))
@@ -26,6 +32,15 @@ class UserLoginData(Base):
     recovery_token_time = Column(Date)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     hashing_algorithms = relationship("HashingAlgorithms")
+
+class ExternalUserLogin(Base):
+    __tablename__ = 'external_user_login'
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    user_id = Column(Integer, ForeignKey('user_login.id'))
+    provider_id = Column(Integer, ForeignKey('external_providers.id'))
+    provider_token = Column(String(100))
+    external_provider = relationship("ExternalProvider")
 
 class EmailVerification(Base):
     __tablename__ = 'email_verification'
@@ -38,4 +53,4 @@ class EmailVerification(Base):
     is_used = Column(Boolean, default=False)
     expired_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow() + timedelta(minutes=15))
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    user_login = relationship("UserLoginData")
+    user_login = relationship("UserLogin")
