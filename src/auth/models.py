@@ -31,8 +31,7 @@ class UserLogin(Base):
     __tablename__ = 'user_login'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    password_hash = Column(String(250))
-    password_salt = Column(String(100))
+    password = Column(String(250))
     hash_algorithm_id = Column(Integer, ForeignKey('hashing_algorithms.id'))
     email = Column(String(100))
     is_active = Column(Boolean, default=False)
