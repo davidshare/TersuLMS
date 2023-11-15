@@ -17,6 +17,8 @@ class HashingAlgorithm(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     algorithm_name = Column(String(10))
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     
 
 class ExternalProvider(Base):
@@ -39,6 +41,7 @@ class UserLogin(Base):
     password_recovery_token = Column(String(100))
     recovery_token_time = Column(Date)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     hashing_algorithms = relationship("HashingAlgorithms")
 
 class ExternalUserLogin(Base):
