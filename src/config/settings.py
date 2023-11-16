@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT: str = "5432"
     POSTGRES_HOST: str = "127.0.0.1"
     POSTGRES_URI: str = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DATABASE}"
+    HASH_ALGORITHM: str = "eqeer"
 
     model_config = SettingsConfigDict(env_file=".env")
 
