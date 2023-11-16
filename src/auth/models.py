@@ -42,7 +42,7 @@ class UserLogin(Base):
     recovery_token_time = Column(Date)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    hashing_algorithms = relationship("HashingAlgorithms")
+    hashing_algorithm = relationship(HashingAlgorithm)
 
 class ExternalUserLogin(Base):
     __tablename__ = 'external_user_login'
