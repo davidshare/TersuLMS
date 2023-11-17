@@ -1,7 +1,7 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from .models import UserAuth, HashingAlgorithm
-from .schemas import HashingAlgorithmCreate, UserAuthSave
+from .schemas import HashingAlgorithmCreate, UserAuthCreate, UserAuthResponse
 from ..config.database import SessionLocal
 from ..exceptions import DatabaseOperationException, AlreadyExistsException, NotFoundException
 
@@ -9,16 +9,29 @@ from ..exceptions import DatabaseOperationException, AlreadyExistsException, Not
 class AuthService:
     """Service class for authentication-related operations."""
     @staticmethod
-    def create(user_data: UserAuthSave):
+    def create(user_data: UserAuthCreate):
         """Creates a new user."""
+        hash_algorithm_id = AuthService.get_hash_algorithm_id("bcrypt")
+
+        if not hash_algorithm_id:
+            raise ValueError("Hash algorithm ID could not be determined")
+
         try:
             with SessionLocal() as db:
+                user_data.hash_algorithm_id = hash_algorithm_id
+
                 user = UserAuth(**user_data.dict())
                 db.add(user)
                 db.commit()
                 db.refresh(user)
-                return user
+                response_data = UserAuthResponse(
+                    id=user.id,
+                    email=user.email,
+                    is_email_verified=user.is_email_verified,
+                )
+                return response_data
         except IntegrityError as exc:
+            db.rollback()
             raise AlreadyExistsException(
                 f"User with email {user_data.email} already exists.") from exc
         except SQLAlchemyError as e:
@@ -29,9 +42,11 @@ class AuthService:
         """Fetches a user by their email."""
         try:
             with SessionLocal() as db:
-                user = db.query(UserAuth).filter(UserAuth.email == email).first()
+                user = db.query(UserAuth).filter(
+                    UserAuth.email == email).first()
                 if not user:
-                    raise NotFoundException(f"User with email {email} not found.")
+                    raise NotFoundException(
+                        f"User with email {email} not found.")
                 return user
         except SQLAlchemyError as e:
             # Handling any other database related errors

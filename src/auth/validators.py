@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 
-def password_length_validator(password: str):
+
+def validate_password_length(password: str):
     """
     Validate the length of a password.
 
@@ -13,6 +14,7 @@ def password_length_validator(password: str):
     Raises:
     HTTPException: If the password length is not within the required range.
     """
-    if password and not (8 <= len(password) <= 20):
-        raise HTTPException(
-            status_code=400, detail="Password must be between 8 and 20 characters")
+    def validate_password_length(password: str):
+        if not (8 <= len(password) <= 20):
+            raise ValueError("Password must be between 8 and 20 characters")
+        return password

@@ -1,16 +1,18 @@
 from fastapi import HTTPException
-from .service import AuthService
-from .schemas import UserLoginCreate, HashingAlgorithmCreate
-from .security import hash_password
 from src.exceptions import NotFoundException, AlreadyExistsException, DatabaseOperationException
+from .service import AuthService
+from .schemas import UserAuthCreate, HashingAlgorithmCreate
+from .security import hash_password
+
 
 
 class AuthController:
     """Controller class to handle authentication-related requests."""
 
     @staticmethod
-    def create(user_data: UserLoginCreate):
+    def create(user_data: UserAuthCreate):
         try:
+            print(user_data)
             user_data.password = hash_password(user_data.password)
             return AuthService.create(user_data)
         except AlreadyExistsException as e:
