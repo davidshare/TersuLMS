@@ -29,7 +29,7 @@ class ExternalProvider(Base):
     web_service_endpoint = Column(String(200))
 
 
-class UserLogin(Base):
+class UserAuth(Base):
     __tablename__ = 'user_login'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
@@ -44,7 +44,7 @@ class UserLogin(Base):
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     hashing_algorithm = relationship(HashingAlgorithm)
 
-class ExternalUserLogin(Base):
+class ExternalUserAuth(Base):
     __tablename__ = 'external_user_login'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
@@ -64,7 +64,7 @@ class EmailVerification(Base):
     is_used = Column(Boolean, default=False)
     expired_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow() + timedelta(minutes=15))
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    user_login = relationship("UserLogin")
+    user_login = relationship("UserAuth")
 
 class UserRole(Base):
     __tablename__ = 'user_roles'

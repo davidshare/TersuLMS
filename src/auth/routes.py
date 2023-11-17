@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends
 from .controller import AuthController
-from .schemas import UserLoginCreate, HashingAlgorithmCreate
+from .schemas import UserAuthCreate, HashingAlgorithmCreate
 from .dependencies import password_length_validator
 
 router = APIRouter()
 
 
 @router.post("/user/")
-def create_user(user_data: UserLoginCreate = Depends(password_length_validator)):
+def create_user(user_data: UserAuthCreate = Depends(password_length_validator)):
     """API endpoint to create a new user."""
     return AuthController.create(user_data)
 

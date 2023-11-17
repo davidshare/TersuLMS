@@ -1,7 +1,7 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from .models import UserLogin, HashingAlgorithm
-from .schemas import HashingAlgorithmCreate
+from .models import UserAuth, HashingAlgorithm
+from .schemas import HashingAlgorithmCreate, UserAuthSave
 from ..config.database import SessionLocal
 from ..exceptions import DatabaseOperationException, AlreadyExistsException, NotFoundException
 
@@ -9,11 +9,11 @@ from ..exceptions import DatabaseOperationException, AlreadyExistsException, Not
 class AuthService:
     """Service class for authentication-related operations."""
     @staticmethod
-    def create(user_data):
+    def create(user_data: UserAuthSave):
         """Creates a new user."""
         try:
             with SessionLocal() as db:
-                user = UserLogin(**user_data.dict())
+                user = UserAuth(**user_data.dict())
                 db.add(user)
                 db.commit()
                 db.refresh(user)
@@ -29,7 +29,7 @@ class AuthService:
         """Fetches a user by their email."""
         try:
             with SessionLocal() as db:
-                user = db.query(UserLogin).filter(UserLogin.email == email).first()
+                user = db.query(UserAuth).filter(UserAuth.email == email).first()
                 if not user:
                     raise NotFoundException(f"User with email {email} not found.")
                 return user
