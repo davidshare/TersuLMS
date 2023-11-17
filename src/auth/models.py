@@ -35,7 +35,7 @@ class UserAuth(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     password = Column(String(250))
     hash_algorithm_id = Column(Integer, ForeignKey('hashing_algorithms.id'))
-    email = Column(String(100))
+    email = Column(String(100), unique=True)
     is_active = Column(Boolean, default=False)
     is_email_verified = Column(Boolean, default=False)
     password_recovery_token = Column(String(100))
