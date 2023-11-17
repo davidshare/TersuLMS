@@ -8,7 +8,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    user_id = Column(Integer, ForeignKey('user_login.id'))
+    user_id = Column(Integer, ForeignKey('user_auth.id'))
     username = Column(String(20))
     fullname = Column(String(200))
     gender = Column(String(10))
@@ -18,4 +18,4 @@ class User(Base):
     profile_picture = Column(String(255))
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    user_login = relationship("UserLogin")
+    user_auth = relationship("UserLogin")

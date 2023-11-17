@@ -12,6 +12,7 @@ psycopg2-binary = "*"
 alembic = "*"
 email-validator = "*"
 passlib = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
 
 [dev-packages]
 

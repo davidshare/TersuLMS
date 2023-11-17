@@ -1,22 +1,51 @@
-class AlreadyExistsException(Exception):
-    """Raised when a resource with the given already exists."""
+class ApplicationException(Exception):
+    """Base class for application-specific exceptions."""
 
-    def __init__(self, message="The resource already exists."):
+    def __init__(self, message: str = "An error occurred in the application."):
         self.message = message
         super().__init__(self.message)
 
+    def __str__(self):
+        return f"{self.__class__.__name__}: {self.message}"
 
-class NotFoundException(Exception):
+
+class AlreadyExistsException(ApplicationException):
+    """Raised when a resource already exists."""
+
+    def __init__(self, message: str = "The resource already exists."):
+        super().__init__(message)
+
+
+class NotFoundException(ApplicationException):
     """Raised when a requested resource is not found."""
 
-    def __init__(self, message="Resource not found."):
-        self.message = message
-        super().__init__(self.message)
+    def __init__(self, message: str = "Resource not found."):
+        super().__init__(message)
 
 
-class DatabaseOperationException(Exception):
+class DatabaseOperationException(ApplicationException):
     """Raised for general database operation failures."""
 
-    def __init__(self, message="Database operation failed."):
-        self.message = message
-        super().__init__(self.message)
+    def __init__(self, message: str = "Database operation failed."):
+        super().__init__(message)
+
+
+class AuthenticationException(ApplicationException):
+    """Exception raised for authentication-related errors."""
+
+    def __init__(self, message: str = "Authentication failed."):
+        super().__init__(message)
+
+
+class TokenExpiredError(ApplicationException):
+    """Raised when a token has expired."""
+
+    def __init__(self, message: str = "Authentication failed."):
+        super().__init__(message)
+
+
+class InvalidTokenError(ApplicationException):
+    """Raised when a token is invalid."""
+
+    def __init__(self, message: str = "Authentication failed."):
+        super().__init__(message)

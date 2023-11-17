@@ -8,8 +8,24 @@ granted_permissions = Table(
     'granted_permissions',
     Base.metadata,
     Column('role_id', ForeignKey('user_roles.id'), primary_key=True),
-    Column('permissions_id', ForeignKey('user_permissions.id'), primary_key=True)
+    Column('permissions_id', ForeignKey(
+        'user_permissions.id'), primary_key=True)
 )
+
+
+class UserRole(Base):
+    __tablename__ = 'user_roles'
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    description = Column(String(255))
+    users = relationship("UserAuth", back_populates="user_role")
+
+
+class UserPermissions(Base):
+    __tablename__ = 'user_permissions'
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    description = Column(String(255))
 
 
 class HashingAlgorithm(Base):
@@ -19,7 +35,7 @@ class HashingAlgorithm(Base):
     algorithm_name = Column(String(10))
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    
+
 
 class ExternalProvider(Base):
     __tablename__ = 'external_providers'
@@ -29,51 +45,58 @@ class ExternalProvider(Base):
     web_service_endpoint = Column(String(200))
 
 
-class UserAuth(Base):
-    __tablename__ = 'user_login'
+class RefreshToken(Base):
+    __tablename__ = 'refresh_tokens'
 
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    id = Column(Integer, primary_key=True)
+    token = Column(String, unique=True)
+    user_id = Column(Integer, ForeignKey('user_auth.id'))
+    user = relationship("UserAuth", back_populates="refresh_tokens")
+    is_used = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime)
+
+
+class UserAuth(Base):
+    __tablename__ = 'user_auth'
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(100), unique=True)
     password = Column(String(250))
     hash_algorithm_id = Column(Integer, ForeignKey('hashing_algorithms.id'))
-    email = Column(String(100), unique=True)
     is_active = Column(Boolean, default=False)
     is_email_verified = Column(Boolean, default=False)
     password_recovery_token = Column(String(100))
     recovery_token_time = Column(Date)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    hashing_algorithm = relationship(HashingAlgorithm)
+    user_role_id = Column(Integer, ForeignKey('user_roles.id'))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+    hashing_algorithm = relationship("HashingAlgorithm")
+    user_role = relationship("UserRole")
+    refresh_tokens = relationship(
+        "RefreshToken", order_by=RefreshToken.id, back_populates="user")
+
 
 class ExternalUserAuth(Base):
-    __tablename__ = 'external_user_login'
+    __tablename__ = 'external_user_auth'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    user_id = Column(Integer, ForeignKey('user_login.id'))
+    user_id = Column(Integer, ForeignKey('user_auth.id'))
     provider_id = Column(Integer, ForeignKey('external_providers.id'))
     provider_token = Column(String(100))
     external_provider = relationship("ExternalProvider")
+
 
 class EmailVerification(Base):
     __tablename__ = 'email_verification'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    user_id = Column(Integer, ForeignKey('user_login.id'))
+    user_id = Column(Integer, ForeignKey('user_auth.id'))
     confirmation_token = Column(String(100))
     token_generation_time = Column(Date)
     is_active = Column(Boolean, default=False)
     is_used = Column(Boolean, default=False)
-    expired_at = Column(DateTime, nullable=False, default=lambda: datetime.utcnow() + timedelta(minutes=15))
+    expired_at = Column(DateTime, nullable=False,
+                        default=lambda: datetime.utcnow() + timedelta(minutes=15))
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    user_login = relationship("UserAuth")
-
-class UserRole(Base):
-    __tablename__ = 'user_roles'
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    description = Column(String(255))
-
-class UserPermissions(Base):
-    __tablename__ = 'user_permissions'
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    description = Column(String(255))
+    user_auth = relationship("UserAuth")
