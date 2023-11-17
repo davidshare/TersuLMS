@@ -12,7 +12,7 @@ A learning management system
 
 ## Important urls
 ### FastAPI documentation
-- http://<HOST>:8000/doc
+- http://<HOST>:8000/docs
 - http://<HOST>:8000/redoc
 
 ### Best practices adopted
