@@ -1,6 +1,8 @@
 from fastapi import HTTPException
 from .service import RoleService
-from ..exceptions import AlreadyExistsException, DatabaseOperationException
+from ..exceptions import (
+    AlreadyExistsException, DatabaseOperationException, NotFoundException
+)
 
 class RoleController:
     """Controller class for handling permissions."""
@@ -21,6 +23,18 @@ class RoleController:
         """Handles getting all permissions"""
         try:
             return RoleService.get_permissions()
+        except DatabaseOperationException as e:
+            print(e)
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def get_permission_by_name(permission_name: str):
+        """Handles getting a permission by name"""
+        try:
+            return RoleService.get_permission_by_name(permission_name)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
         except DatabaseOperationException as e:
             print(e)
             raise HTTPException(

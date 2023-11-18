@@ -1,5 +1,5 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from ..exceptions import AlreadyExistsException, DatabaseOperationException
+from ..exceptions import AlreadyExistsException, DatabaseOperationException, NotFoundException
 from .models import UserPermissions
 from ..config.database import get_db
 
@@ -32,6 +32,21 @@ class RoleService:
             db = next(get_db())
             permissions = db.query(UserPermissions).all()
             return permissions
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+        
+    @staticmethod
+    def get_permission_by_name(permission_name: str):
+        """Handles getting a permission by name"""
+        try:
+            db = next(get_db())
+            permission = db.query(UserPermissions).filter(
+                UserPermissions.permission_name == permission_name).first()
+            if not permission:
+                raise NotFoundException(
+                        f"The permission {permission_name} does not exist.")
+            return permission
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
