@@ -64,3 +64,9 @@ def delete_hashing_algorithm(algorithm_id: int):
 def create_user_role(role_name: UserRoleCreate):
     """API endpoint to create a new user role."""
     return AuthController.create_role(role_name)
+
+@router.get("/users/roles/{role_name}", status_code=status.HTTP_200_OK, response_model=UserRoleResponse)
+def get_user_role(role_name: str):
+    """API endpoint to get a user role by name."""
+    return AuthController.get_role_by_name(role_name)
+

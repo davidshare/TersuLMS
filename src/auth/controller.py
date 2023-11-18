@@ -130,3 +130,14 @@ class AuthController:
             print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def get_role_by_name(role_name: UserRoleCreate):
+        """Handles getting roles by name"""
+        try:
+            return AuthService.get_role_by_name(role_name)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
+        except DatabaseOperationException as e:
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e

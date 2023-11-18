@@ -291,3 +291,16 @@ class AuthService:
                 f"Role {role_name} already exists.") from exc
         except SQLAlchemyError as e:
             raise DatabaseOperationException(str(e)) from e
+        
+    @staticmethod
+    def get_role_by_name(role_name: UserRoleCreate):
+        """Returns a role based on its name."""
+        try:
+            with SessionLocal() as db:
+                role = db.query(UserRole).filter(
+                    UserRole.role_name == role_name).first()
+                if not role:
+                    raise NotFoundException("Role not found")
+                return role
+        except SQLAlchemyError as e:
+            raise DatabaseOperationException(str(e)) from e
