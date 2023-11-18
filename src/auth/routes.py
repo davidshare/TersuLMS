@@ -65,6 +65,11 @@ def create_user_role(role_name: UserRoleCreate):
     """API endpoint to create a new user role."""
     return AuthController.create_role(role_name)
 
+@router.get("/users/roles/", status_code=status.HTTP_200_OK, response_model=list[UserRoleResponse])
+def get_all_user_roles():
+    """API endpoint to get all user roles."""
+    return AuthController.get_all_roles()
+
 @router.get("/users/roles/{role_name}", status_code=status.HTTP_200_OK, response_model=UserRoleResponse)
 def get_user_role(role_name: str):
     """API endpoint to get a user role by name."""

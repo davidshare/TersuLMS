@@ -69,7 +69,8 @@ class AuthService:
         """Refreshes JWT token."""
         try:
             # Decode the refresh token
-            payload = decode_token(token, settings.JWT_SECRET_KEY, [settings.JWT_ALGORITHM])
+            payload = decode_token(token, settings.JWT_SECRET_KEY, [
+                                   settings.JWT_ALGORITHM])
 
             user_id = payload.get("id")
             if user_id is None:
@@ -78,9 +79,10 @@ class AuthService:
             with SessionLocal() as db:
                 refresh_token_record = AuthService.get_latest_refresh_token(
                     user_id)
-                
+
                 if is_token_expired(refresh_token_record.token, settings.JWT_REFRESH_TOKEN_SECRET_KEY):
-                    raise AuthenticationException("Authentication failed! Please try again")
+                    raise AuthenticationException(
+                        "Authentication failed! Please try again")
 
                 if not refresh_token_record or refresh_token_record.is_used:
                     raise AuthenticationException(
@@ -275,7 +277,7 @@ class AuthService:
                     raise NotFoundException("Hashing algorithm not found")
         except SQLAlchemyError as e:
             raise DatabaseOperationException(str(e)) from e
-        
+
     @staticmethod
     def create_role(role_name: UserRoleCreate):
         """Creates a new role."""
@@ -291,7 +293,17 @@ class AuthService:
                 f"Role {role_name} already exists.") from exc
         except SQLAlchemyError as e:
             raise DatabaseOperationException(str(e)) from e
-        
+
+    @staticmethod
+    def get_all_roles():
+        """Returns all roles."""
+        try:
+            with SessionLocal() as db:
+                roles = db.query(UserRole).all()
+                return [{"id": role.id, "role_name": role.role_name} for role in roles]
+        except SQLAlchemyError as e:
+            raise DatabaseOperationException(str(e))from e
+
     @staticmethod
     def get_role_by_name(role_name: UserRoleCreate):
         """Returns a role based on its name."""
