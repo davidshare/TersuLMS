@@ -1,7 +1,11 @@
 from fastapi import APIRouter, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from .controller import AuthController
-from .schemas import UserAuthCreate, HashingAlgorithmCreate, UserAuthResponse, UserAuthLogin, TokenResponse, UserRoleCreate, UserRoleResponse, RoleUpdate
+from .schemas import (
+    UserAuthCreate, HashingAlgorithmCreate, UserAuthResponse,
+    UserAuthLogin, TokenResponse, UserRoleCreate, UserRoleResponse,
+    RoleUpdate
+    )
 
 router = APIRouter()
 hashing_router = APIRouter()

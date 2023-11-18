@@ -96,3 +96,5 @@ class RoleUpdate(BaseModel):
         new_role_name (str): The name of the role.
     """
     new_role_name: str
+
+

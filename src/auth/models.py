@@ -4,15 +4,6 @@ from sqlalchemy.orm import relationship
 
 from ..config.database import Base
 
-granted_permissions = Table(
-    'granted_permissions',
-    Base.metadata,
-    Column('role_id', ForeignKey('user_roles.id'), primary_key=True),
-    Column('permissions_id', ForeignKey(
-        'user_permissions.id'), primary_key=True)
-)
-
-
 class UserRole(Base):
     __tablename__ = 'user_roles'
 
@@ -21,14 +12,6 @@ class UserRole(Base):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     users = relationship("UserAuth", back_populates="user_role")
-
-
-class UserPermissions(Base):
-    __tablename__ = 'user_permissions'
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    description = Column(String(255))
-
 
 class HashingAlgorithm(Base):
     __tablename__ = 'hashing_algorithms'

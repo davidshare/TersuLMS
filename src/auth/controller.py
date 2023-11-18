@@ -205,3 +205,4 @@ class AuthController:
         except DatabaseOperationException as e:
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
+        
