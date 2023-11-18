@@ -2,7 +2,7 @@ from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from src.exceptions import NotFoundException, AlreadyExistsException, DatabaseOperationException, AuthenticationException, TokenExpiredError, InvalidTokenError
 from .service import AuthService
-from .schemas import UserAuthCreate, HashingAlgorithmCreate, UserAuthLogin
+from .schemas import UserAuthCreate, HashingAlgorithmCreate, UserAuthLogin, UserRoleCreate
 from .security import hash_password
 
 
@@ -117,5 +117,16 @@ class AuthController:
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=str(e)) from e
         except DatabaseOperationException as e:
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def create_role(role_name: UserRoleCreate):
+        try:
+            return AuthService.create_role(role_name)
+        except AlreadyExistsException as e:
+            raise HTTPException(status_code=409, detail=str(e)) from e
+        except DatabaseOperationException as e:
+            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e

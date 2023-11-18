@@ -69,3 +69,21 @@ class TokenResponse(BaseModel):
 
     access_token: str
     token_type: str
+
+class UserRoleCreate(BaseModel):
+    """
+    A Pydantic model representing a user role.
+
+    Attributes:
+        role_name (str): The name of the role.
+    """
+    role_name: str
+
+class UserRoleResponse(UserRoleCreate):
+    """
+    A Pydantic model representing a user role.
+
+    Attributes:
+        id (int): The ID of the role.
+    """
+    id: int

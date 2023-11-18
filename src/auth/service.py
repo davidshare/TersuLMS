@@ -1,8 +1,8 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from jose import jwt, JWTError, ExpiredSignatureError
 
-from .models import UserAuth, HashingAlgorithm, RefreshToken
-from .schemas import HashingAlgorithmCreate, UserAuthCreate, UserAuthLogin, UserAuthResponse
+from .models import UserAuth, HashingAlgorithm, RefreshToken, UserRole
+from .schemas import HashingAlgorithmCreate, UserAuthCreate, UserAuthLogin, UserAuthResponse, UserRoleCreate
 from ..config.database import SessionLocal
 from ..exceptions import DatabaseOperationException, AlreadyExistsException, NotFoundException, AuthenticationException, TokenExpiredError
 from .security import verify_password, create_token, decode_token, is_token_expired
@@ -159,7 +159,7 @@ class AuthService:
         except ExpiredSignatureError as e:
             raise TokenExpiredError(str("what the fuck!!!")) from e
         except JWTError as e:
-            raise ValueError(str(e)) from e
+            raise AuthenticationException(str(e)) from e
         except SQLAlchemyError as e:
             raise DatabaseOperationException(str(e)) from e
         except Exception as e:
@@ -273,5 +273,21 @@ class AuthService:
                     return True
                 else:
                     raise NotFoundException("Hashing algorithm not found")
+        except SQLAlchemyError as e:
+            raise DatabaseOperationException(str(e)) from e
+        
+    @staticmethod
+    def create_role(role_name: UserRoleCreate):
+        """Creates a new role."""
+        try:
+            with SessionLocal() as db:
+                role = UserRole(role_name=role_name.role_name)
+                db.add(role)
+                db.commit()
+                db.refresh(role)
+                return role
+        except IntegrityError as exc:
+            raise AlreadyExistsException(
+                f"Role {role_name} already exists.") from exc
         except SQLAlchemyError as e:
             raise DatabaseOperationException(str(e)) from e

@@ -17,7 +17,9 @@ class UserRole(Base):
     __tablename__ = 'user_roles'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    description = Column(String(255))
+    role_name = Column(String(50), unique=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     users = relationship("UserAuth", back_populates="user_role")
 
 

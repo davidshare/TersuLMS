@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from .controller import AuthController
-from .schemas import UserAuthCreate, HashingAlgorithmCreate, UserAuthResponse, UserAuthLogin, TokenResponse
+from .schemas import UserAuthCreate, HashingAlgorithmCreate, UserAuthResponse, UserAuthLogin, TokenResponse,UserRoleCreate, UserRoleResponse
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -13,7 +13,7 @@ def create_user(user_data: UserAuthCreate):
     return AuthController.create(user_data)
 
 
-@router.post("/user/login", status_code=status.HTTP_200_OK, response_model=TokenResponse)
+@router.post("/users/login", status_code=status.HTTP_200_OK, response_model=TokenResponse)
 def login(user_data: UserAuthLogin):
     """API endpoint to authenticate a user and generate a JWT token."""
     return AuthController.login(user_data)
@@ -59,3 +59,8 @@ def update_hashing_algorithm(algorithm_id: int, algorithm_name: HashingAlgorithm
 def delete_hashing_algorithm(algorithm_id: int):
     """API endpoint to delete a hashing algorithm."""
     return AuthController.delete_hashing_algorithm(algorithm_id)
+
+@router.post("/users/roles/", status_code=status.HTTP_200_OK, response_model=UserRoleResponse)
+def create_user_role(role_name: UserRoleCreate):
+    """API endpoint to create a new user role."""
+    return AuthController.create_role(role_name)
