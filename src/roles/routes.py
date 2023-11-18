@@ -26,3 +26,8 @@ def get_permission_by_name(permission_name: str):
 def get_permission_by_id(permission_id: int):
     """API endpoint to get a user permission by id."""
     return RoleController.get_permission_by_id(permission_id)
+
+@router.put("/permissions/id/{permission_id}", status_code=status.HTTP_200_OK, response_model=UserPermissionResponse)
+def update_permission_by_id(permission_id: int, permission: UserPermissionCreate):
+    """API endpoint to update a user permission by id."""
+    return RoleController.update_permission_by_id(permission_id, permission.permission_name)

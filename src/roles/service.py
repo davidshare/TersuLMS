@@ -65,3 +65,25 @@ class RoleService:
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
+        
+    @staticmethod
+    def update_permission_by_id(permission_id: int, permission_name: str):
+        """Handles updating a permission by id"""
+        try:
+            db = next(get_db())
+            permission = db.query(UserPermissions).filter(
+                UserPermissions.id == permission_id).first()
+            if not permission:
+                raise NotFoundException(
+                        f"The permission with id {permission_id} does not exist.")
+            permission.permission_name = permission_name
+            db.commit()
+            db.refresh(permission)
+            return permission
+        except IntegrityError as e:
+            db.rollback()
+            raise AlreadyExistsException(
+                f"The permission {permission_name} already exists.") from e
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
