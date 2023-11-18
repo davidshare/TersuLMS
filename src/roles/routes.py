@@ -42,3 +42,13 @@ def update_permission_by_id(permission_id: int, permission: UserPermissionCreate
 def update_permission_by_name(old_permission_name: str, permission_update: UserPermissionUpdate):
     """API endpoint to update a user permission by name."""
     return RoleController.update_permission_by_name(old_permission_name, permission_update.new_permission_name)
+
+@router.delete("/permissions/id/{permission_id}", status_code=status.HTTP_200_OK)
+def delete_permission_by_id(permission_id: int):
+    """API endpoint to delete a user permission by id."""
+    return RoleController.delete_permission_by_id(permission_id)
+
+@router.delete("/permissions/name/{permission_name}", status_code=status.HTTP_200_OK)
+def delete_permission_by_name(permission_name: str):
+    """API endpoint to delete a user permission by name."""
+    return RoleController.delete_permission_by_name(permission_name)

@@ -75,4 +75,27 @@ class RoleController:
             print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
-        
+    
+    @staticmethod
+    def delete_permission_by_id(permission_id: int):
+        """Handles deleting a permission by id"""
+        try:
+            return RoleService.delete_permission_by_id(permission_id)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e            
+        except DatabaseOperationException as e:
+            print(e)
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
+
+    @staticmethod
+    def delete_permission_by_name(permission_name: str):
+        """Handles deleting a permission by name"""
+        try:
+            return RoleService.delete_permission_by_name(permission_name)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e            
+        except DatabaseOperationException as e:
+            print(e)
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e

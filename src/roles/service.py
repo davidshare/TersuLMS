@@ -109,4 +109,37 @@ class RoleService:
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
-            
+    
+    @staticmethod
+    def delete_permission_by_id(permission_id: int):
+        """Handles deleting a permission by id"""
+        try:
+            db = next(get_db())
+            permission = db.query(UserPermissions).filter(
+                UserPermissions.id == permission_id).first()
+            if not permission:
+                raise NotFoundException(
+                        f"The permission with id {permission_id} does not exist.")
+            db.delete(permission)
+            db.commit()
+            return permission
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+    
+    @staticmethod
+    def delete_permission_by_name(permission_name: str):
+        """Handles deleting a permission by name"""
+        try:
+            db = next(get_db())
+            permission = db.query(UserPermissions).filter(
+                UserPermissions.permission_name == permission_name).first()
+            if not permission:
+                raise NotFoundException(
+                        f"The permission {permission_name} does not exist.")
+            db.delete(permission)
+            db.commit()
+            return permission
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
