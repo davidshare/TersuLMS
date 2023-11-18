@@ -30,3 +30,12 @@ class UserPermissionResponse(Permission):
         permission_name (str): The name of the permission.
     """
     id: int
+
+class UserPermissionUpdate(BaseModel):
+    """
+    A Pydantic model representing a user permission.
+
+    Attributes:
+        new_permission_name (str): The name of the permission.
+    """
+    new_permission_name: str

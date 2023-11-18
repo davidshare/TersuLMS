@@ -87,3 +87,26 @@ class RoleService:
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
+    
+    @staticmethod
+    def update_permission_by_name(old_permission_name: str, new_permission_name: str):
+        """Handles updating a permission by name"""
+        try:
+            db = next(get_db())
+            permission = db.query(UserPermissions).filter(
+                UserPermissions.permission_name == old_permission_name).first()
+            if not permission:
+                raise NotFoundException(
+                        f"The permission {old_permission_name} does not exist.")
+            permission.permission_name = new_permission_name
+            db.commit()
+            db.refresh(permission)
+            return permission
+        except IntegrityError as e:
+            db.rollback()
+            raise AlreadyExistsException(
+                f"The permission {new_permission_name} already exists.") from e
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+            

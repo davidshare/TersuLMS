@@ -63,3 +63,16 @@ class RoleController:
             print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def update_permission_by_name(old_permission_name: str, new_permission_name: str):
+        """Handles updating a permission by name"""
+        try:
+            return RoleService.update_permission_by_name(old_permission_name, new_permission_name)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e            
+        except DatabaseOperationException as e:
+            print(e)
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
+        
