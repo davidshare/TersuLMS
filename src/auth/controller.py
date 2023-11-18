@@ -183,3 +183,25 @@ class AuthController:
         except DatabaseOperationException as e:
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def delete_role_by_id(role_id: int):
+        """Handles deleting roles"""
+        try:
+            return AuthService.delete_role_by_id(role_id)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
+        except DatabaseOperationException as e:
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def delete_role_by_name(role_name: str):
+        """Handles deleting roles"""
+        try:
+            return AuthService.delete_role_by_name(role_name)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
+        except DatabaseOperationException as e:
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e

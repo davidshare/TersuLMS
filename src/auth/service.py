@@ -363,3 +363,35 @@ class AuthService:
                     raise NotFoundException("Role not found")
         except SQLAlchemyError as e:
             raise DatabaseOperationException(str(e)) from e
+
+    @staticmethod
+    def delete_role_by_id(role_id: int):
+        """Deletes a role."""
+        try:
+            with SessionLocal() as db:
+                role = db.query(UserRole).filter(
+                    UserRole.id == role_id).first()
+                if role:
+                    db.delete(role)
+                    db.commit()
+                    return True
+                else:
+                    raise NotFoundException("Role not found")
+        except SQLAlchemyError as e:
+            raise DatabaseOperationException(str(e)) from e
+
+    @staticmethod
+    def delete_role_by_name(role_name: str):
+        """Deletes a role."""
+        try:
+            with SessionLocal() as db:
+                role = db.query(UserRole).filter(
+                    UserRole.role_name == role_name).first()
+                if role:
+                    db.delete(role)
+                    db.commit()
+                    return True
+                else:
+                    raise NotFoundException("Role not found")
+        except SQLAlchemyError as e:
+            raise DatabaseOperationException(str(e)) from e
