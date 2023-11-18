@@ -133,6 +133,7 @@ class AuthController:
     
     @staticmethod
     def get_all_roles():
+        """Handles getting all roles"""
         try:
             return AuthService.get_all_roles()
         except DatabaseOperationException as e:
