@@ -149,3 +149,14 @@ class AuthController:
         except DatabaseOperationException as e:
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def get_role_by_id(role_id: int):
+        """Handles getting roles by ID"""
+        try:
+            return AuthService.get_role_by_id(role_id)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
+        except DatabaseOperationException as e:
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e

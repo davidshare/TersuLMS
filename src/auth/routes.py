@@ -70,8 +70,13 @@ def get_all_user_roles():
     """API endpoint to get all user roles."""
     return AuthController.get_all_roles()
 
+@router.get("/users/roles/{role_id}", status_code=status.HTTP_200_OK, response_model=UserRoleResponse)
+def get_user_role_by_id(role_id: int):
+    """API endpoint to get a user role by ID."""
+    return AuthController.get_role_by_id(role_id)
+
 @router.get("/users/roles/{role_name}", status_code=status.HTTP_200_OK, response_model=UserRoleResponse)
-def get_user_role(role_name: str):
+def get_user_role_by_name(role_name: str):
     """API endpoint to get a user role by name."""
     return AuthController.get_role_by_name(role_name)
 

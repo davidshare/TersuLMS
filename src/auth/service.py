@@ -316,3 +316,16 @@ class AuthService:
                 return role
         except SQLAlchemyError as e:
             raise DatabaseOperationException(str(e)) from e
+        
+    @staticmethod
+    def get_role_by_id(role_id: int):
+        """Returns a role based on its ID."""
+        try:
+            with SessionLocal() as db:
+                role = db.query(UserRole).filter(
+                    UserRole.id == role_id).first()
+                if not role:
+                    raise NotFoundException("Role not found")
+                return role
+        except SQLAlchemyError as e:
+            raise DatabaseOperationException(str(e)) from e
