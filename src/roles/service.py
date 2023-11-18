@@ -25,3 +25,13 @@ class RoleService:
             print(e)
             raise DatabaseOperationException(str(e)) from e
         
+    @staticmethod
+    def get_permissions():
+        """Handles getting all permissions"""
+        try:
+            db = next(get_db())
+            permissions = db.query(UserPermissions).all()
+            return permissions
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e

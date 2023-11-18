@@ -16,4 +16,12 @@ class RoleController:
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
         
-        
+    @staticmethod
+    def get_permissions():
+        """Handles getting all permissions"""
+        try:
+            return RoleService.get_permissions()
+        except DatabaseOperationException as e:
+            print(e)
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e

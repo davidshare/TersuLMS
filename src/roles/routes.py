@@ -12,3 +12,7 @@ def create_user_permission(permission: UserPermissionCreate):
     """API endpoint to create a new user permission."""
     return RoleController.create_permission(permission.permission_name)
 
+@router.get("/permissions/", status_code=status.HTTP_200_OK, response_model=list[UserPermissionResponse])
+def get_user_permissions():
+    """API endpoint to get all user permissions."""
+    return RoleController.get_permissions()

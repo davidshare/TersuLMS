@@ -9,7 +9,7 @@ class UserPermissions(Base):
     __tablename__ = 'user_permissions'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    permission_name = Column(String(100))
+    permission_name = Column(String(100), unique=True, nullable=False)
 
 granted_permissions = Table(
     'granted_permissions',
