@@ -87,3 +87,12 @@ class UserRoleResponse(UserRoleCreate):
         id (int): The ID of the role.
     """
     id: int
+
+class RoleUpdate(BaseModel):
+    """
+    A Pydantic model representing a user role.
+
+    Attributes:
+        new_role_name (str): The name of the role.
+    """
+    new_role_name: str

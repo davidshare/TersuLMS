@@ -316,7 +316,7 @@ class AuthService:
                 return role
         except SQLAlchemyError as e:
             raise DatabaseOperationException(str(e)) from e
-        
+
     @staticmethod
     def get_role_by_id(role_id: int):
         """Returns a role based on its ID."""
@@ -327,5 +327,39 @@ class AuthService:
                 if not role:
                     raise NotFoundException("Role not found")
                 return role
+        except SQLAlchemyError as e:
+            raise DatabaseOperationException(str(e)) from e
+
+    @staticmethod
+    def update_role_by_id(role_id: int, new_role_name: str):
+        """Updates a role's name."""
+        try:
+            with SessionLocal() as db:
+                role = db.query(UserRole).filter(
+                    UserRole.id == role_id).first()
+                if role:
+                    role.role_name = new_role_name
+                    db.commit()
+                    print(role)
+                    return {"id": role.id, "role_name": role.role_name}
+                else:
+                    raise NotFoundException("Role not found")
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+
+    @staticmethod
+    def update_role_by_name(old_role_name: str, new_role_name: str):
+        """Updates a role's name."""
+        try:
+            with SessionLocal() as db:
+                role = db.query(UserRole).filter(
+                    UserRole.role_name == old_role_name).first()
+                if role:
+                    role.role_name = new_role_name
+                    db.commit()
+                    return {"id": role.id, "role_name": role.role_name}
+                else:
+                    raise NotFoundException("Role not found")
         except SQLAlchemyError as e:
             raise DatabaseOperationException(str(e)) from e

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from .controller import AuthController
-from .schemas import UserAuthCreate, HashingAlgorithmCreate, UserAuthResponse, UserAuthLogin, TokenResponse,UserRoleCreate, UserRoleResponse
+from .schemas import UserAuthCreate, HashingAlgorithmCreate, UserAuthResponse, UserAuthLogin, TokenResponse,UserRoleCreate, UserRoleResponse, RoleUpdate
 
 router = APIRouter()
 hashing_router = APIRouter()
@@ -81,4 +81,14 @@ def get_user_role_by_id(role_id: int):
 def get_user_role_by_name(role_name: str):
     """API endpoint to get a user role by name or id."""
     return AuthController.get_role_by_name(role_name)
+
+@user_roles_router.put("/users/roles/id/{role_id}", status_code=status.HTTP_200_OK, response_model=UserRoleCreate)
+def update_user_role_by_id(role_id: int, role_name: UserRoleCreate):
+    """API endpoint to update a user role."""
+    return AuthController.update_role_by_id(role_id, role_name)
+
+@user_roles_router.put("/users/roles/name/{old_role_name}", status_code=status.HTTP_200_OK, response_model=UserRoleCreate)
+def update_user_role_by_name(old_role_name: str, role_update: RoleUpdate):
+    """API endpoint to update a user role."""
+    return AuthController.update_role_by_name(old_role_name, role_update.new_role_name)
 
