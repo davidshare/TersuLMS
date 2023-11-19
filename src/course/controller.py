@@ -42,4 +42,14 @@ class CourseController:
             print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def get_courses():
+        """Handles getting all courses"""
+        try:
+            return CourseService.get_courses()
+        except DatabaseOperationException as e:
+            print(e)
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
 

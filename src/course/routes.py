@@ -19,3 +19,8 @@ def get_course_by_slug(slug: str):
 def get_course_by_id(course_id: int):
     """API endpoint to get a course by id."""
     return CourseController.get_course_by_id(course_id)
+
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[CourseResponse])
+def get_courses():
+    """API endpoint to get all courses."""
+    return CourseController.get_courses()

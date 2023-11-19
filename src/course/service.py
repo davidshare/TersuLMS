@@ -59,3 +59,16 @@ class CourseService:
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
+        
+    @staticmethod
+    def get_courses():
+        """
+        Handles getting all courses
+        """
+        try:
+            db = next(get_db())
+            courses = db.query(Course).all()
+            return courses
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
