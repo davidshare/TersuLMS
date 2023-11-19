@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from .auth.routes import router as auth_router, hashing_router, user_roles_router
 from .roles.routes import router as roles_router
+from .course_category.routes import router as course_category_router
 
 global_router = APIRouter()
 
@@ -14,3 +15,6 @@ global_router.include_router(
 
 global_router.include_router(
     roles_router, prefix="/api/v1/roles", tags=["roles"])
+
+global_router.include_router(
+    course_category_router, prefix="/api/v1/categories", tags=["categories"])
