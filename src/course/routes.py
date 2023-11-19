@@ -9,3 +9,8 @@ router = APIRouter()
 def create_course(course: CourseCreate):
     """API endpoint to create a new course."""
     return CourseController.create_course(course)
+
+@router.get("/slug/{slug}", status_code=status.HTTP_200_OK, response_model=CourseResponse)
+def get_course_by_slug(slug: str):
+    """API endpoint to get a course by slug."""
+    return CourseController.get_course_by_slug(slug)
