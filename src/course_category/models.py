@@ -8,8 +8,8 @@ class CourseCategory(Base):
     """Course Category Model"""
     __tablename__ = 'course_category'
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=False, unique=True)
     description = Column(String(255), nullable=True)
-    courses = relationship('Course', backref='course_category', lazy=True)
+    # courses = relationship('Course', backref='course_category', lazy=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
