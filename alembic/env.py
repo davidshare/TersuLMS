@@ -9,6 +9,7 @@ from src.auth.models import *
 from src.user.models import *
 from src.roles.models import *
 from src.course_category.models import *
+from src.course.models import *
 
 from src.config.settings import settings
 from src.config.database import Base

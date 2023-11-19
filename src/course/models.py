@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import (
-    Column, Integer, String, DateTime,
-    ForeignKey, Text 
+    Column, Integer, String, DateTime, Boolean,
+    ForeignKey, Text, Float 
 )
 
 from ..config.database import Base
@@ -13,14 +13,15 @@ class Course(Base):
     id = Column(Integer, primary_key=True)
     course_category_id = Column(Integer, ForeignKey('course_category.id'))
     title = Column(String(50), nullable=False)
-    description = Column(Text, nullable=True)
-    price = Column(Integer, nullable=False)
-    tags = Column(String(255), nullable=True)
-    course_level = Column(String(50), nullable=True)
-    course_language = Column(String(50), nullable=True)
-    course_duration = Column(String(50), nullable=True)
+    slug = Column(String(50), nullable=False, unique=True)
+    description = Column(Text, nullable=False)
+    price = Column(Float, nullable=False)
+    course_level = Column(String(50), nullable=False)
+    course_language = Column(String(50), nullable=False)
+    course_duration = Column(Integer, nullable=True)
     course_thumbnail = Column(String(255), nullable=True)
-    author_id = Column(Integer, ForeignKey('user.id'))
-    published = Column(Integer, nullable=False, default=0)
+    author_id = Column(Integer, ForeignKey('user_auth.id'))
+    published = Column(Boolean, default=False)
+    published_at = Column(DateTime, default=datetime.utcnow)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
