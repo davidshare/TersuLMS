@@ -28,7 +28,7 @@ class CourseService:
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
-        
+
     @staticmethod
     def get_course_by_slug(slug: str):
         """
@@ -38,7 +38,23 @@ class CourseService:
             db = next(get_db())
             course = db.query(Course).filter(Course.slug == slug).first()
             if not course:
-                raise NotFoundException(f"Course with slug {slug} does not exist.")
+                raise NotFoundException(
+                    f"Course with slug {slug} does not exist.")
+            return course
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+
+    @staticmethod
+    def get_course_by_id(course_id: int):
+        """
+        Handles getting courses by id
+        """
+        try:
+            db = next(get_db())
+            course = db.query(Course).filter(Course.id == course_id).first()
+            if not course:
+                raise NotFoundException(f"Course with id {course_id} does not exist.")
             return course
         except SQLAlchemyError as e:
             print(e)

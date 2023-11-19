@@ -30,4 +30,16 @@ class CourseController:
             print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def get_course_by_id(course_id: int):
+        """Handles getting courses by id"""
+        try:
+            return CourseService.get_course_by_id(course_id)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
+        except DatabaseOperationException as e:
+            print(e)
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
 
