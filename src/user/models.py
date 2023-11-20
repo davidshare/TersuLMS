@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship
 from ..config.database import Base
 
 class User(Base):
+    """Model for user profile."""
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
@@ -14,8 +15,8 @@ class User(Base):
     gender = Column(String(10))
     birthdate = Column(DateTime)
     role_id = Column(Integer, ForeignKey('user_roles.id'))
-    user_roles = relationship("UserRoles")
     profile_picture = Column(String(255))
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    user_auth = relationship("UserLogin")
+    user_auth = relationship("UserAuth", back_populates="users")
+    user_role = relationship("UserRole", back_populates="users")

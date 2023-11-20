@@ -14,7 +14,8 @@ class UserRole(Base, TimestampMixin):
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     role_name = Column(String(50), unique=True)
-    users = relationship("UserAuth", back_populates="user_role")
+    user_auth = relationship("UserAuth", back_populates="user_role")
+    users = relationship("User", back_populates="user_role")
 
 
 class UserPermissions(Base, TimestampMixin):

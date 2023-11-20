@@ -32,9 +32,11 @@ class UserAuth(Base, TimestampMixin):
     recovery_token_time = Column(Date)
     user_role_id = Column(Integer, ForeignKey('user_roles.id'))
     hashing_algorithm = relationship("HashingAlgorithm")
-    user_role = relationship("UserRole")
     refresh_tokens = relationship(
         "RefreshToken", order_by=RefreshToken.id, back_populates="user")
+    user_role = relationship("UserRole", back_populates="user_auth")
+    users = relationship("User", back_populates="user_auth")
+        
 
 class EmailVerification(Base):
     """Model for email verification."""
@@ -48,5 +50,4 @@ class EmailVerification(Base):
     is_used = Column(Boolean, default=False)
     expired_at = Column(DateTime, nullable=False,
                         default=lambda: datetime.utcnow() + timedelta(minutes=15))
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     user_auth = relationship("UserAuth")
