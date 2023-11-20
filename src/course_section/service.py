@@ -1,4 +1,3 @@
-from webbrowser import get
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..exceptions import DatabaseOperationException, NotFoundException
