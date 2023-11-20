@@ -1,36 +1,12 @@
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Boolean, DateTime, Table
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Boolean, DateTime
 from sqlalchemy.orm import relationship
 
+from src.model_mixins import TimestampMixin
 from ..config.database import Base
 
-class UserRole(Base):
-    __tablename__ = 'user_roles'
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    role_name = Column(String(50), unique=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    users = relationship("UserAuth", back_populates="user_role")
-
-class HashingAlgorithm(Base):
-    __tablename__ = 'hashing_algorithms'
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    algorithm_name = Column(String(10))
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-
-
-class ExternalProvider(Base):
-    __tablename__ = 'external_providers'
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    provider_name = Column(String(50))
-    web_service_endpoint = Column(String(200))
-
-
 class RefreshToken(Base):
+    """Model for refresh tokens."""
     __tablename__ = 'refresh_tokens'
 
     id = Column(Integer, primary_key=True)
@@ -42,7 +18,8 @@ class RefreshToken(Base):
     expires_at = Column(DateTime)
 
 
-class UserAuth(Base):
+class UserAuth(Base, TimestampMixin):
+    """Model for user authentication."""
     __tablename__ = 'user_auth'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -54,25 +31,13 @@ class UserAuth(Base):
     password_recovery_token = Column(String(100))
     recovery_token_time = Column(Date)
     user_role_id = Column(Integer, ForeignKey('user_roles.id'))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow)
     hashing_algorithm = relationship("HashingAlgorithm")
     user_role = relationship("UserRole")
     refresh_tokens = relationship(
         "RefreshToken", order_by=RefreshToken.id, back_populates="user")
 
-
-class ExternalUserAuth(Base):
-    __tablename__ = 'external_user_auth'
-
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    user_id = Column(Integer, ForeignKey('user_auth.id'))
-    provider_id = Column(Integer, ForeignKey('external_providers.id'))
-    provider_token = Column(String(100))
-    external_provider = relationship("ExternalProvider")
-
-
 class EmailVerification(Base):
+    """Model for email verification."""
     __tablename__ = 'email_verification'
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
