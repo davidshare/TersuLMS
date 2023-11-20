@@ -1,4 +1,6 @@
 from fastapi import APIRouter, status
+
+from src.auth.schemas import RoleUpdate, UserRoleCreate, UserRoleResponse
 from .controller import RoleController
 
 from .schemas import (
@@ -7,6 +9,52 @@ from .schemas import (
 
 router = APIRouter()
 
+@router.post("/users/roles/", status_code=status.HTTP_200_OK, response_model=UserRoleResponse)
+def create_user_role(role_name: UserRoleCreate):
+    """API endpoint to create a new user role."""
+    return RoleController.create_role(role_name)
+
+
+@router.get("/users/roles/", status_code=status.HTTP_200_OK, response_model=list[UserRoleResponse])
+def get_all_user_roles():
+    """API endpoint to get all user roles."""
+    return RoleController.get_all_roles()
+
+
+@router.get("/users/roles/id/{role_id}", status_code=status.HTTP_200_OK, response_model=UserRoleResponse)
+def get_user_role_by_id(role_id: int):
+    """API endpoint to get a user role by ID."""
+    return RoleController.get_role_by_id(role_id)
+
+
+@router.get("/users/roles/name/{role_name}", status_code=status.HTTP_200_OK, response_model=UserRoleResponse)
+def get_user_role_by_name(role_name: str):
+    """API endpoint to get a user role by name or id."""
+    return RoleController.get_role_by_name(role_name)
+
+
+@router.put("/users/roles/id/{role_id}", status_code=status.HTTP_200_OK, response_model=UserRoleCreate)
+def update_user_role_by_id(role_id: int, role_name: UserRoleCreate):
+    """API endpoint to update a user role."""
+    return RoleController.update_role_by_id(role_id, role_name)
+
+
+@router.put("/users/roles/name/{old_role_name}", status_code=status.HTTP_200_OK, response_model=UserRoleCreate)
+def update_user_role_by_name(old_role_name: str, role_update: RoleUpdate):
+    """API endpoint to update a user role."""
+    return RoleController.update_role_by_name(old_role_name, role_update.new_role_name)
+
+
+@router.delete("/users/roles/id/{role_id}", status_code=status.HTTP_200_OK)
+def delete_user_role_by_id(role_id: int):
+    """API endpoint to delete a user role."""
+    return RoleController.delete_role_by_id(role_id)
+
+
+@router.delete("/users/roles/name/{role_name}", status_code=status.HTTP_200_OK)
+def delete_user_role_by_name(role_name: str):
+    """API endpoint to delete a user role."""
+    return RoleController.delete_role_by_name(role_name)
 
 @router.post("/permissions/", status_code=status.HTTP_200_OK, response_model=UserPermissionResponse)
 def create_user_permission(permission: UserPermissionCreate):
