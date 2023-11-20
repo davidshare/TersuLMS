@@ -99,5 +99,20 @@ class CourseService:
             print(e)
             raise DatabaseOperationException(str(e)) from e
         
+    @staticmethod
+    def delete_course_by_id(course_id: int):
+        """Deletes a course by id."""
+        try:
+            db = next(get_db())
+            course = db.query(Course).filter(Course.id == course_id).first()
+            if not course:
+                raise NotFoundException(f"Course with id {course_id} not found")
+
+            db.delete(course)
+            db.commit()
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+        
 #TODO: Add proper logging
 

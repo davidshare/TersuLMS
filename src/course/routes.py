@@ -29,3 +29,8 @@ def get_courses():
 def update_course_by_id(course_id: int, course: CourseUpdate):
     """API endpoint to update a course by id."""
     return CourseController.update_course_by_id(course_id, course)
+
+@router.delete("/id/{course_id}", status_code=status.HTTP_200_OK)
+def delete_course_by_id(course_id: int):
+    """API endpoint to delete a course by id."""
+    return CourseController.delete_course_by_id(course_id)

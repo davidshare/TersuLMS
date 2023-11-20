@@ -64,4 +64,16 @@ class CourseController:
             print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def delete_course_by_id(course_id: int):
+        """Handles deleting a course by id"""
+        try:
+            return CourseService.delete_course_by_id(course_id)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
+        except DatabaseOperationException as e:
+            print(e)
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
 
