@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 
 from .controller import CourseController
-from .schemas import CourseCreate, CourseResponse
+from .schemas import CourseCreate, CourseResponse, CourseUpdate
 
 router = APIRouter()
 
@@ -24,3 +24,8 @@ def get_course_by_id(course_id: int):
 def get_courses():
     """API endpoint to get all courses."""
     return CourseController.get_courses()
+
+@router.put("/id/{course_id}", status_code=status.HTTP_200_OK, response_model=CourseResponse)
+def update_course_by_id(course_id: int, course: CourseUpdate):
+    """API endpoint to update a course by id."""
+    return CourseController.update_course_by_id(course_id, course)

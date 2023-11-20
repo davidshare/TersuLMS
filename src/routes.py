@@ -23,3 +23,8 @@ global_router.include_router(
 
 global_router.include_router(
     course_router, prefix="/api/v1/courses", tags=["courses"])
+
+"""
+TODO: check all routes and ensure the use of correct HTTP status codes
+TODO: check all routes and ensure the use of correct response methods
+"""

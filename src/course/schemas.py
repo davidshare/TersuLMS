@@ -17,23 +17,19 @@ class CourseCreate(BaseModel):
     price: float
 
 
-class UpdateCourse(BaseModel):
+class CourseUpdate(BaseModel):
     """Update Course Schema"""
-    id: Optional[int] = None
     course_category_id: Optional[int] = None
     title: Optional[str] = None
-    slug: Optional[str] = None
     description: Optional[str] = None
     price: Optional[float] = None
     course_level: Optional[str] = None
     course_language: Optional[str] = None
     course_duration: Optional[int] = None
     course_thumbnail: Optional[str] = None
-    author_id: Optional[int] = None
     published: Optional[bool] = False
     published_at: Optional[datetime] = None
     
-
     class Config:
         """Pydantic ORM mode config"""
         orm_mode = True

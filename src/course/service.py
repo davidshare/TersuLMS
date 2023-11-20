@@ -54,12 +54,13 @@ class CourseService:
             db = next(get_db())
             course = db.query(Course).filter(Course.id == course_id).first()
             if not course:
-                raise NotFoundException(f"Course with id {course_id} does not exist.")
+                raise NotFoundException(
+                    f"Course with id {course_id} does not exist.")
             return course
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
-        
+
     @staticmethod
     def get_courses():
         """
@@ -72,3 +73,31 @@ class CourseService:
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
+
+    @staticmethod
+    def update_course_by_id(course_id: int, course_data):
+        """Updates a course based on the given data."""
+        try:
+            db = next(get_db())
+            course = db.query(Course).filter(Course.id == course_id).first()
+            if not course:
+                raise NotFoundException(f"Course with id {course_id} not found")
+
+            # Iterate through the dictionary and update only if the value is not None
+            for key, value in course_data.dict(exclude_unset=True).items():
+                if hasattr(course, key) and key != 'slug' and value is not None:
+                    setattr(course, key, value)
+
+            db.commit()
+            db.refresh(course)
+            return course
+        except IntegrityError as e:
+            print(e)
+            db.rollback()
+            raise AlreadyExistsException(f"Conflict in updating course {course_id}.") from e
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+        
+#TODO: Add proper logging
+

@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from .schemas import CourseCreate
+from .schemas import CourseCreate, CourseUpdate
 from ..exceptions import AlreadyExistsException, DatabaseOperationException, NotFoundException
 from .service import CourseService
 
@@ -48,6 +48,18 @@ class CourseController:
         """Handles getting all courses"""
         try:
             return CourseService.get_courses()
+        except DatabaseOperationException as e:
+            print(e)
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
+        
+    @staticmethod
+    def update_course_by_id(course_id: int, course_data: CourseUpdate):
+        """Handles updating a course by id"""
+        try:
+            return CourseService.update_course_by_id(course_id, course_data)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
         except DatabaseOperationException as e:
             print(e)
             raise HTTPException(

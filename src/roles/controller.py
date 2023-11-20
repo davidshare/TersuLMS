@@ -99,3 +99,10 @@ class RoleController:
             print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
+        
+
+        """
+        TODO: check all controllers and ensure the use of correct HTTP status codes
+        TODO: check all controllers and ensure consistency in format and error handling
+        TODO: check all controllers and ensure the use of correct commenting format
+        """
