@@ -49,3 +49,9 @@ class InvalidTokenError(ApplicationException):
 
     def __init__(self, message: str = "Authentication failed."):
         super().__init__(message)
+
+class UniqueConstraintViolationException(ApplicationException):
+    """Raised when a unique constraint is violated."""
+
+    def __init__(self, message: str = "Unique constraint violated."):
+        super().__init__(message)

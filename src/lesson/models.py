@@ -27,6 +27,7 @@ class Lesson(Base, TimestampMixin):
     section = relationship("Section", back_populates="lessons")
 
     __table_args__ = (
-        UniqueConstraint('section_id', 'course_id', 'title',
-                        'description', name='unique_section_lesson'),
+        UniqueConstraint('section_id', 'course_id', 'title', name='unique_section_lesson'),
+        UniqueConstraint('course_id', 'section_id', 'ordering', name='_course_section_ordering_uc'),
     )
+
