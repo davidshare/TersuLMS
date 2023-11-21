@@ -2,6 +2,8 @@ from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel
 
+from src.model_mixins import TimestampMixin
+
 class LessonBase(BaseModel):
     """Base model for Lesson."""
     title: str
@@ -31,7 +33,7 @@ class LessonUpdate(BaseModel):
     duration: Optional[int] = None
     published: Optional[bool] = None
 
-class LessonResponse(LessonBase):
+class LessonResponse(LessonBase, TimestampMixin):
     """Response model for Lesson."""
     id: int
     content_url: Optional[str]

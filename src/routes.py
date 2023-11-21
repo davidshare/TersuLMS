@@ -6,6 +6,7 @@ from .auth.routes import router as auth_router, user_roles_router
 from .roles.routes import router as roles_router
 from .course_category.routes import router as course_category_router
 from .course.routes import router as course_router
+from .lesson.routes import router as lesson_router
 
 global_router = APIRouter()
 
@@ -29,6 +30,9 @@ global_router.include_router(
 
 global_router.include_router(
     course_section_router, prefix="/api/v1/sections", tags=["sections"])
+
+global_router.include_router(
+    lesson_router, prefix="/api/v1/lessons", tags=["lessons"])
 
 """
 TODO: check all routes and ensure the use of correct HTTP status codes

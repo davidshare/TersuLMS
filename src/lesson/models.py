@@ -1,11 +1,12 @@
 from sqlalchemy import (
     Column, Integer, String, Boolean,
-    ForeignKey, Text
+    ForeignKey, Text, UniqueConstraint
 )
 from sqlalchemy.orm import relationship
 
 from ..config.database import Base
 from ..model_mixins import TimestampMixin
+
 
 class Lesson(Base, TimestampMixin):
     """Model for course lessons"""
@@ -25,3 +26,7 @@ class Lesson(Base, TimestampMixin):
 
     section = relationship("Section", back_populates="lessons")
 
+    __table_args__ = (
+        UniqueConstraint('section_id', 'course_id', 'title',
+                        'description', name='unique_section_lesson'),
+    )
