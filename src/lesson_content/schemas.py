@@ -1,73 +1,81 @@
-from pydantic import BaseModel
 from typing import Optional, List
+from pydantic import BaseModel
 
-class LessonContentBase(BaseModel):
-    """Base model for LessonContent objects"""
-    lesson_id: int
-    content_type: str
+class QuizOptionCreate(BaseModel):
+    """Create model for quiz options."""
+    option_text: str
+    is_correct: bool
 
-class VideoContentCreate(LessonContentBase):
-    """VideoContentCreate model"""
-    video_url: str
-    video_duration: int
+class QuizQuestionCreate(BaseModel):
+    """Create model for quiz questions."""
+    question_text: str
+    options: List[QuizOptionCreate]
 
-class VideoContentUpdate(BaseModel):
-    """VideoContentUpdate model"""
-    video_url: Optional[str] = None
-    video_duration: Optional[int] = None
-
-class VideoContentResponse(VideoContentCreate):
-    """VideoContentResponse model"""
-    id: int
-
-class ArticleContentCreate(LessonContentBase):
-    """ArticleContentCreate model"""
-    article_text: str
-
-class ArticleContentUpdate(BaseModel):
-    """ArticleContentUpdate model"""
-    article_text: Optional[str] = None
-
-class ArticleContentResponse(ArticleContentCreate):
-    """ArticleContentResponse model"""
+class QuizOptionResponse(QuizOptionCreate):
+    """Response model for quiz options."""
     id: int
 
 class QuestionBase(BaseModel):
-    """Base model for Question objects"""
+    """Base model for quiz questions."""
+    id: int
     question_text: str
-    options: List[str]
-    correct_option: int
+    options: List[QuizOptionResponse]
 
+class QuestionResponse(QuestionBase):
+    """Response model for quiz questions."""
+    pass
+
+
+class LessonContentBase(BaseModel):
+    """Base model for lesson content."""
+    lesson_id: int
+    content_type: str
+    
+class VideoContentCreate(LessonContentBase):
+    """Create model for video content."""
+    video_url: str
+    video_duration: int
+    description: str
+
+class ArticleContentCreate(LessonContentBase):
+    """Create model for article content."""
+    article_text: str
 
 class QuizContentCreate(LessonContentBase):
-    """QuizContentCreate model"""
-    quiz_questions: List[QuestionBase]
+    """Create model for quiz content."""
+    quiz_questions: List[QuizQuestionCreate]
 
-class QuizContentUpdate(BaseModel):
-    """QuizContentUpdate model"""
-    quiz_questions: Optional[List[QuestionBase]] = None
+class VideoContentResponse(VideoContentCreate):
+    """Response model for video content."""
+    id: int
+
+class ArticleContentResponse(ArticleContentCreate):
+    """Response model for article content."""
+    id: int
 
 class QuizContentResponse(QuizContentCreate):
-    """QuizContentResponse model"""
+    """Response model for quiz content."""
     id: int
+    lesson_id: int
+    content_type: str
+    quiz_questions: List[QuestionResponse]
 
-class QuizOptionCreate(BaseModel):
-    """QuizOptionCreate model"""
-    text: str
-    is_correct: bool
 
-class QuizOptionUpdate(BaseModel):
-    """QuizOptionUpdate model"""
-    text: Optional[str] = None
-    is_correct: Optional[bool] = None
+class LessonContentUpdate(BaseModel):
+    """Update model for lesson content."""
+    video_url: Optional[str] = None
+    video_duration: Optional[int] = None
+    description: Optional[str] = None
+    article_text: Optional[str] = None
+    quiz_questions: Optional[List[QuestionBase]] = None
 
-class QuizOptionResponse(QuizOptionCreate):
-    """QuizOptionResponse model"""
+class LessonContentResponse(BaseModel):
+    """Response model for lesson content."""
     id: int
-    question_id: int
-
-    class Config:
-        orm_mode = True
-
-
-
+    lesson_id: int
+    content_type: str
+    video_url: Optional[str] = None
+    video_duration: Optional[int] = None
+    description: Optional[str] = None
+    article_text: Optional[str] = None
+    quiz_questions: Optional[List[QuestionBase]] = None
