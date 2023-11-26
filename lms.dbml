@@ -1,0 +1,312 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+//https://dbdiagram.io/d/Tersu-LMS-656314463be1495787be878e
+
+Table hasing_algorithms{
+  id integer
+  algorithm_name varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_roles{
+  id integer
+  role_name varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_permissions{
+  id integer
+  role_id integer [ref: > user_roles.id]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table granted_permissions{
+  role_id integer [ref: > user_roles.id]
+  permission_id integer [ref: > user_permissions.id]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_auth {
+  id integer
+  email varchar
+  password varchar
+  hasing_algorithm_id integer [ref: > hasing_algorithms.id]
+  is_active bool
+  is_email_verified bool
+  password_recovery_token bool
+  recovery_token_time bool
+  user_role_id integer [ref: > user_roles.id]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_profile {
+  id integer
+  user_id integer [ref: > user_auth.id]
+  firstname varchar
+  lastname varchar
+  headline varchar
+  about varchar
+  x_username varchar
+  facebook_username varchar
+  linkedin_username varchar
+  youtube_username varchar
+  website_url varchar
+  language varchar
+  profile_pic_url varchar
+  show_profile bool
+  show_courses_taken bool
+  show_published_courses bool
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table refresh_token {
+  id integer
+  token varchar
+  user_id integer [ref: > user_auth.id]
+  is_used bool
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table external_auth {
+  id integer [pk]
+  user_id integer [ref: > user_auth.id]
+  provider varchar // e.g., 'google', 'facebook', 'twitter', 'github'
+  provider_user_id varchar // Unique identifier from the provider
+  auth_token varchar // Authentication token provided by the external provider
+  token_expiration timestamp // Optional: To store token expiration if applicable
+  provider_data json // To store additional data from the provider, if necessary
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table email_verification {
+  id integer
+  user_id integer [ref: > user_auth.id]
+  confirmation_token varchar
+  token_generation_time timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table course_category {
+  id integer
+  name varchar
+  description varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table course {
+  id integer
+  category_id integer [ref: > course_category.id]
+  title varchar
+  slug varchar
+  description varchar
+  price integer
+  level varchar
+  language varchar
+  duration integer
+  thumbnail varchar
+  author_id integer [ref: > user_auth.id]
+  published bool
+  completed bool
+  published_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table course_section {
+  id integer
+  course_id integer [ref: > course.id]
+  title varchar
+  description varchar
+  duration integer
+  ordering integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table lesson{
+  id integer
+  course_id integer [ref: > course_section.id]
+  section_id integer
+  title varchar
+  description varchar
+  thumbnail_url varchar
+  content_type varchar
+  access_type varchar
+  ordering integer
+  duration integer
+  published bool
+}
+
+Table video_content {
+  id integer
+  lesson_id integer [ref: > lesson.id]
+  url varchar
+  description varchar
+  duration integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table article_content {
+  id integer
+  lesson_id integer [ref: > lesson.id]
+  text varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+
+Table quiz_content {
+  id integer
+  lesson_id integer [ref: > lesson.id]
+  attempt_limit integer
+  published bool
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table quiz_questions {
+  id integer
+  content_id integer [ref: > quiz_content.id]
+  text integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table quiz_options {
+  id integer
+  question_id integer [ref: > quiz_questions.id]
+  text varchar
+  is_correct bool
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_quiz_attempts {
+  id integer [pk]
+  user_id integer [ref: > user_auth.id]
+  quiz_content_id integer [ref: > quiz_content.id]
+  attempt_time timestamp
+  score integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_quiz_responses {
+  id integer [pk]
+  user_quiz_attempt_id integer [ref: > user_quiz_attempts.id]
+  question_id integer [ref: > quiz_questions.id]
+  option_id integer [ref: > quiz_options.id]
+  is_correct bool
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_course_enrollment {
+  id integer [pk]
+  user_id integer [ref: > user_auth.id]
+  course_id integer [ref: > course.id]
+  enrollment_date timestamp
+  status varchar // e.g., 'enrolled', 'completed', 'dropped', etc.
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_lesson_progress {
+  id integer [pk]
+  user_id integer [ref: > user_auth.id]
+  lesson_id integer [ref: > lesson.id]
+  progress_percentage integer // Range from 0 to 100, indicating how much of the lesson is completed
+  status varchar // e.g., 'started', 'completed', 'in_progress', etc.
+  completion_date timestamp // Date when the lesson was completed, null if not completed
+  created_at timestamp
+  updated_at timestamp
+}
+
+
+Table user_course_progress {
+  id integer [pk]
+  user_id integer [ref: > user_auth.id]
+  course_id integer [ref: > course.id]
+  progress_percentage integer // Range from 0 to 100
+  last_accessed_lesson_id integer [ref: > lesson.id]
+  status varchar // e.g., 'active', 'completed', 'paused', etc.
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table course_feedback {
+  id integer [pk]
+  course_id integer [ref: > course.id]
+  user_id integer [ref: > user_auth.id]
+  rating integer // e.g., 1-5
+  comment text
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_notifications {
+  id integer [pk]
+  user_id integer [ref: > user_auth.id]
+  notification_text text
+  is_read bool
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table course_wishlist {
+  id integer [pk]
+  user_id integer [ref: > user_auth.id]
+  course_id integer [ref: > course.id]
+  added_date timestamp
+}
+
+Table course_certificates {
+  id integer [pk]
+  user_id integer [ref: > user_auth.id]
+  course_id integer [ref: > course.id]
+  issue_date timestamp
+  certificate_url varchar
+}
+
+Table lesson_feedback {
+  id integer [pk]
+  lesson_id integer [ref: > lesson.id]
+  user_id integer [ref: > user_auth.id]
+  rating integer // Optional, for example, a scale from 1 to 5
+  comment text
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table payment_methods {
+  id integer [pk]
+  method_name varchar // e.g., 'Credit Card', 'PayPal', etc.
+  provider_details json // Additional details about the payment provider
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_payments {
+  id integer [pk]
+  user_id integer [ref: > user_auth.id]
+  course_id integer [ref: > course.id]
+  amount integer // The amount paid
+  currency varchar // Currency in which the payment was made
+  payment_method_id integer [ref: > payment_methods.id] // Reference to the payment method used
+  transaction_id varchar // ID from the payment gateway for tracking
+  payment_date timestamp
+  payment_status varchar // e.g., 'completed', 'pending', 'failed', etc.
+  created_at timestamp
+  updated_at timestamp
+}
