@@ -9,13 +9,13 @@ from .schemas import (
 
 router = APIRouter()
 
-@router.post("/users/roles/", status_code=status.HTTP_200_OK, response_model=UserRoleResponse)
+@router.post("/", status_code=status.HTTP_200_OK, response_model=UserRoleResponse)
 def create_user_role(role_name: UserRoleCreate):
     """API endpoint to create a new user role."""
     return RoleController.create_role(role_name)
 
 
-@router.get("/users/roles/", status_code=status.HTTP_200_OK, response_model=list[UserRoleResponse])
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[UserRoleResponse])
 def get_all_user_roles():
     """API endpoint to get all user roles."""
     return RoleController.get_all_roles()

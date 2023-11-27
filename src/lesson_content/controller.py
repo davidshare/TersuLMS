@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from src.exceptions import DatabaseOperationException, NotFoundException
+from src.exceptions import DatabaseOperationException, DuplicateQuestionException, NotFoundException, UniqueConstraintViolationException
 from src.lesson_content.schemas import ArticleContentCreate, QuizContentCreate, VideoContentCreate
 from src.lesson_content.service import LessonContentService
 
@@ -38,6 +38,10 @@ class LessonContentController:
             return LessonContentService.create_quiz_content(quiz_content_data)
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=str(e)) from e
+        except UniqueConstraintViolationException as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        except DuplicateQuestionException as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
         except DatabaseOperationException as e:
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e

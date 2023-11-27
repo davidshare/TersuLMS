@@ -16,7 +16,6 @@ class Lesson(Base, TimestampMixin):
     section_id = Column(Integer, ForeignKey('section.id'))
     title = Column(String(50), nullable=False)
     description = Column(Text, nullable=True)
-    content_url = Column(String(255), nullable=True)
     thumbnail_url = Column(String(255), nullable=True)
     content_type = Column(String(50), nullable=False)
     access_type = Column(String(50), nullable=False)

@@ -1,73 +1,69 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, Boolean, JSON
+from sqlalchemy import Column, Integer, ForeignKey, Text, UniqueConstraint, String, Boolean
 from sqlalchemy.orm import relationship
 
 from ..config.database import Base
 from ..model_mixins import TimestampMixin
 
 
-class LessonContent(Base, TimestampMixin):
-    """LessonContent Model"""
-    __tablename__ = 'lesson_content'
-    id = Column(Integer, primary_key=True)
-    lesson_id = Column(Integer, ForeignKey('lessons.id'))
-    content_type = Column(String, nullable=False)
-    __mapper_args__ = {
-        'polymorphic_identity': 'lesson_content',
-        'polymorphic_on': content_type
-    }
-
-
-class VideoContent(LessonContent, TimestampMixin):
+class VideoContent(Base, TimestampMixin):
     """VideoContent Model"""
     __tablename__ = 'video_content'
-    id = Column(Integer, ForeignKey('lesson_content.id'), primary_key=True)
-    video_url = Column(String, nullable=False)
+    id = Column(Integer, primary_key=True)
+    lesson_id = Column(Integer, ForeignKey('lessons.id'))
+    url = Column(String, nullable=False, unique=True)
     description = Column(Text, nullable=False)
-    video_duration = Column(Integer, nullable=False)
+    duration = Column(Integer, nullable=False)
     __mapper_args__ = {
         'polymorphic_identity': 'video_content',
     }
 
 
-class ArticleContent(LessonContent, TimestampMixin):
+class ArticleContent(Base, TimestampMixin):
     """ArticleContent Model"""
     __tablename__ = 'article_content'
-    id = Column(Integer, ForeignKey('lesson_content.id'), primary_key=True)
-    article_text = Column(Text, nullable=False)
+    id = Column(Integer, primary_key=True)
+    lesson_id = Column(Integer, ForeignKey('lessons.id'))
+    text = Column(Text, nullable=False, unique=True)
     __mapper_args__ = {
         'polymorphic_identity': 'article_content',
     }
 
 
-class QuizContent(LessonContent, TimestampMixin):
+class QuizContent(Base, TimestampMixin):
     """QuizContent Model"""
     __tablename__ = 'quiz_content'
-    id = Column(Integer, ForeignKey('lesson_content.id'), primary_key=True)
+    id = Column(Integer, primary_key=True)
+    lesson_id = Column(Integer, ForeignKey('lessons.id'))
+    attempts_allowed = Column(Integer, nullable=False)
+    published = Column(Boolean, default=False)
 
-    quiz_questions = relationship(
-        'QuizQuestion', back_populates='quiz_content')
+    quiz_questions = relationship('QuizQuestions', back_populates='quiz_content')
 
     __mapper_args__ = {
-        'polymorphic_identity': 'quiz',
+        'polymorphic_identity': 'quiz_content',
     }
 
 
-class QuizQuestion(Base):
+class QuizQuestions(Base):
     """QuizQuestion Model"""
-    __tablename__ = 'quiz_question'
-
+    __tablename__ = 'quiz_questions'
     id = Column(Integer, primary_key=True)
-    quiz_content_id = Column(Integer, ForeignKey('quiz_content.id'))
-    question_text = Column(Text, nullable=False)
+    quiz_id = Column(Integer, ForeignKey('quiz_content.id'))
+    question = Column(Text, nullable=False)
+
     quiz_content = relationship('QuizContent', back_populates='quiz_questions')
-    options = relationship("QuizOption", back_populates="quiz_question")
+    options = relationship('QuizOption', back_populates='quiz_question')
 
 
 class QuizOption(Base, TimestampMixin):
     """QuizOption Model"""
     __tablename__ = 'quiz_option'
     id = Column(Integer, primary_key=True)
-    question_id = Column(Integer, ForeignKey('quiz_question.id'))
-    option_text = Column(String, nullable=False)
+    question_id = Column(Integer, ForeignKey('quiz_questions.id'))
+    text = Column(String, nullable=False)
     is_correct = Column(Boolean, default=False)
-    quiz_question = relationship("QuizQuestion", back_populates="options")
+    quiz_question = relationship('QuizQuestions', back_populates='options')
+
+    __table_args__ = (
+        UniqueConstraint('question_id', 'text', name='_question_option_text_uc'),
+    )

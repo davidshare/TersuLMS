@@ -1,12 +1,16 @@
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
+from sqlalchemy.exc import SQLAlchemyError
 from src.config.database import get_db
-from src.exceptions import DatabaseOperationException, NotFoundException
+from src.exceptions import (
+    DatabaseOperationException, NotFoundException,
+)
 from src.lesson.models import Lesson
 from src.lesson_content.models import (
-    ArticleContent, QuizContent, QuizOption, QuizQuestion, VideoContent
+    ArticleContent, QuizContent, QuizOption, QuizQuestions, VideoContent
 )
-from src.lesson_content.schemas import ArticleContentCreate, QuestionResponse, QuizContentCreate, QuizContentResponse, QuizOptionResponse, VideoContentCreate
+from src.lesson_content.schemas import (
+    ArticleContentCreate, QuizContentCreate, VideoContentCreate
+)
 
 
 class LessonContentService:
@@ -55,55 +59,55 @@ class LessonContentService:
 
     @staticmethod
     def create_quiz_content(quiz_content_data: QuizContentCreate):
+        """
+        Handles creating quiz content with unique questions and their options.
+        :param quiz_content_data: QuizContentCreate, data for creating the quiz content, including questions and options.
+        :return: QuizContent, the created quiz content.
+        """
         try:
             db = next(get_db())
-
+            # Check if the associated lesson exists
             lesson = db.query(Lesson).filter(Lesson.id == quiz_content_data.lesson_id).first()
             if not lesson:
                 raise NotFoundException(f"Lesson with id {quiz_content_data.lesson_id} not found")
 
-            # Create QuizContent instance
-            quiz_content = QuizContent(lesson_id=quiz_content_data.lesson_id, content_type=quiz_content_data.content_type)
+            # Create quiz content
+            quiz_content = QuizContent(
+                lesson_id=quiz_content_data.lesson_id, 
+                attempts_allowed=quiz_content_data.attempts_allowed, 
+                published=quiz_content_data.published
+            )
             db.add(quiz_content)
             db.flush()
 
+            # Add unique questions with options to the quiz
             for question_data in quiz_content_data.quiz_questions:
-                quiz_question = QuizQuestion(question_text=question_data.question_text, quiz_content=quiz_content)
-                db.add(quiz_question)
-                db.flush()
-                
-                for option_data in question_data.options:
-                    quiz_option = QuizOption(option_text=option_data.option_text, is_correct=option_data.is_correct, question_id=quiz_question.id)
-                    db.add(quiz_option)
+                # Correcting the filter condition to match the model attributes
+                existing_question = db.query(QuizQuestions).filter(
+                    QuizQuestions.quiz_id == quiz_content.id,
+                    QuizQuestions.question == question_data.question
+                ).first()
 
+                if existing_question is None:
+                    # Question doesn't exist, so add it
+                    question = QuizQuestions(quiz_id=quiz_content.id, question=question_data.question)
+                    db.add(question)
+                    db.flush()
+
+                    # Add options for the question
+                    for option_data in question_data.options:
+                        option = QuizOption(
+                            question_id=question.id, 
+                            text=option_data.text, 
+                            is_correct=option_data.is_correct
+                        )
+                        db.add(option)
             db.commit()
-
-            quiz_content = db.query(QuizContent).options(joinedload(QuizContent.quiz_questions).joinedload(QuizQuestion.options)).filter_by(id=quiz_content.id).first()
-
-            # Construct the response
-            quiz_questions_response = [
-                QuestionResponse(
-                    id=question.id,
-                    question_text=question.question_text,
-                    options=[
-                        QuizOptionResponse(
-                            id=option.id,
-                            option_text=option.option_text,
-                            is_correct=option.is_correct
-                        ) for option in question.options
-                    ]
-                ) for question in quiz_content.quiz_questions
-            ]
-
-            quiz_content_response = QuizContentResponse(
-                id=quiz_content.id,
-                lesson_id=quiz_content.lesson_id,
-                content_type=quiz_content.content_type,
-                quiz_questions=quiz_questions_response
-            )
-
-            return quiz_content_response
-
+            quiz_content = db.query(QuizContent).options(
+                joinedload(QuizContent.quiz_questions)
+            ).filter_by(id=quiz_content.id).first()
+            return quiz_content
         except SQLAlchemyError as e:
+            print(e)
             db.rollback()
             raise DatabaseOperationException(str(e)) from e

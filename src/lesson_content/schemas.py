@@ -1,81 +1,119 @@
-from typing import Optional, List
+from typing import List, Optional
 from pydantic import BaseModel
-
-class QuizOptionCreate(BaseModel):
-    """Create model for quiz options."""
-    option_text: str
-    is_correct: bool
-
-class QuizQuestionCreate(BaseModel):
-    """Create model for quiz questions."""
-    question_text: str
-    options: List[QuizOptionCreate]
-
-class QuizOptionResponse(QuizOptionCreate):
-    """Response model for quiz options."""
-    id: int
-
-class QuestionBase(BaseModel):
-    """Base model for quiz questions."""
-    id: int
-    question_text: str
-    options: List[QuizOptionResponse]
-
-class QuestionResponse(QuestionBase):
-    """Response model for quiz questions."""
-    pass
 
 
 class LessonContentBase(BaseModel):
-    """Base model for lesson content."""
+    """
+    Base schema for lesson content. This class serves as a foundation for defining
+    various types of lesson content schemas.
+
+    Attributes:
+        lesson_id (int): The unique identifier of the associated lesson.
+
+    This class inherits from BaseModel, which is a base class provided by Pydantic
+    used for defining data validation, serialization, and model attributes.
+    """
     lesson_id: int
-    content_type: str
-    
-class VideoContentCreate(LessonContentBase):
-    """Create model for video content."""
-    video_url: str
-    video_duration: int
-    description: str
+
 
 class ArticleContentCreate(LessonContentBase):
-    """Create model for article content."""
-    article_text: str
+    """
+    Schema for creating article content.
 
-class QuizContentCreate(LessonContentBase):
-    """Create model for quiz content."""
-    quiz_questions: List[QuizQuestionCreate]
+    Attributes:
+        text (str): The text of the article.
 
-class VideoContentResponse(VideoContentCreate):
-    """Response model for video content."""
-    id: int
+    This class inherits from LessonContentBase.
+    """
+    text: str
+
 
 class ArticleContentResponse(ArticleContentCreate):
-    """Response model for article content."""
+    """
+    Schema for returning article content.
+
+    This class inherits from ArticleContentCreate.
+    """
     id: int
+
+
+class VideoContentCreate(LessonContentBase):
+    """
+    Schema for creating video content.
+
+    Attributes:
+        url (str): The url of the video.
+        description (str): The description of the video.
+        duration (int): The duration of the video in seconds.
+
+    This class inherits from LessonContentBase.
+    """
+    url: str
+    description: str
+    duration: int
+
+
+class VideoContentResponse(VideoContentCreate):
+    """
+    Schema for returning video content.
+
+    This class inherits from VideoContentCreate.
+    """
+    id: int
+
+
+class QuizOptionBase(BaseModel):
+    """
+    Base schema for quiz options. This class serves as a foundation for defining
+    various types of quiz option schemas.
+
+    Attributes:
+        text (str): The text of the quiz option.
+        is_correct (bool): Whether the quiz option is correct or not.
+
+    This class inherits from BaseModel.
+    """
+    question_id: Optional[int] = None
+    text: str
+    is_correct: bool
+
+
+class QuizQuestionCreate(BaseModel):
+    """
+    Schema for creating quiz questions.
+
+    Attributes:
+        question_text (str): The text of the quiz question.
+        options (List[QuizOptionBase]): The list of quiz options.
+
+    This class inherits from BaseModel.
+    """
+    quiz_id: Optional[int] = None
+    question: str
+    options: List[QuizOptionBase]
+
+
+class QuizContentCreate(LessonContentBase):
+    """
+    Schema for creating quiz content.
+
+    Attributes:
+        attempts_allowed (int): The number of attempts allowed for the quiz.
+        published (bool): Whether the quiz is published or not.
+        questions (List[QuizQuestionCreate]): The list of quiz questions.
+
+    This class inherits from LessonContentBase.
+    """
+    quiz_questions: List[QuizQuestionCreate]
+    attempts_allowed: int
+    published: bool
+
 
 class QuizContentResponse(QuizContentCreate):
-    """Response model for quiz content."""
+    """
+    Schema for returning quiz content.
+
+    This class inherits from QuizContentCreate.
+    """
     id: int
-    lesson_id: int
-    content_type: str
-    quiz_questions: List[QuestionResponse]
-
-
-class LessonContentUpdate(BaseModel):
-    """Update model for lesson content."""
-    video_url: Optional[str] = None
-    video_duration: Optional[int] = None
-    description: Optional[str] = None
-    article_text: Optional[str] = None
-    quiz_questions: Optional[List[QuestionBase]] = None
-
-class LessonContentResponse(BaseModel):
-    """Response model for lesson content."""
-    id: int
-    lesson_id: int
-    content_type: str
-    video_url: Optional[str] = None
-    video_duration: Optional[int] = None
-    description: Optional[str] = None
-    article_text: Optional[str] = None
-    quiz_questions: Optional[List[QuestionBase]] = None
+    

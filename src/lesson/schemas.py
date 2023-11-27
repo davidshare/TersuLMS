@@ -16,7 +16,6 @@ class LessonBase(BaseModel):
 
 class LessonCreate(LessonBase):
     """Create model for Lesson."""
-    content_url: Optional[str]
     thumbnail_url: Optional[str]
     course_id: int
     section_id: int
@@ -25,7 +24,6 @@ class LessonUpdate(BaseModel):
     """Update model for Lesson."""
     title: Optional[str] = None
     description: Optional[str] = None
-    content_url: Optional[str] = None
     thumbnail_url: Optional[str] = None
     content_type: Optional[str] = None
     access_type: Optional[str] = None
@@ -36,7 +34,6 @@ class LessonUpdate(BaseModel):
 class LessonResponse(LessonBase, TimestampMixin):
     """Response model for Lesson."""
     id: int
-    content_url: Optional[str]
     thumbnail_url: Optional[str]
     created_at: datetime
     updated_at: datetime

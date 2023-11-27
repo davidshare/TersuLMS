@@ -70,7 +70,6 @@ class RoleService:
                 if role:
                     role.role_name = new_role_name
                     db.commit()
-                    print(role)
                     return {"id": role.id, "role_name": role.role_name}
                 else:
                     raise NotFoundException("Role not found")

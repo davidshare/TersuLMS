@@ -55,3 +55,9 @@ class UniqueConstraintViolationException(ApplicationException):
 
     def __init__(self, message: str = "Unique constraint violated."):
         super().__init__(message)
+
+class DuplicateQuestionException(ApplicationException):
+    """Raised when a duplicate question is found in a quiz."""
+
+    def __init__(self, message: str = "Duplicate question found in quiz."):
+        super().__init__(message)
