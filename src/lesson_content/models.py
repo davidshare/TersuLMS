@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, ForeignKey, Text, UniqueConstraint, String, Boolean
+from sqlalchemy import Column, Integer, ForeignKey, Text, UniqueConstraint, String, Boolean, null
 from sqlalchemy.orm import relationship
+
+from src import lesson
 
 from ..config.database import Base
 from ..model_mixins import TimestampMixin
@@ -33,7 +35,7 @@ class QuizContent(Base, TimestampMixin):
     """QuizContent Model"""
     __tablename__ = 'quiz_content'
     id = Column(Integer, primary_key=True)
-    lesson_id = Column(Integer, ForeignKey('lessons.id'))
+    lesson_id = Column(Integer, ForeignKey('lessons.id'), unique=True)
     attempts_allowed = Column(Integer, nullable=False)
     published = Column(Boolean, default=False)
 
@@ -48,11 +50,16 @@ class QuizQuestions(Base):
     """QuizQuestion Model"""
     __tablename__ = 'quiz_questions'
     id = Column(Integer, primary_key=True)
-    quiz_id = Column(Integer, ForeignKey('quiz_content.id'))
+    lesson_id = Column(Integer, ForeignKey('lessons.id'), nullable=False)
+    quiz_id = Column(Integer, ForeignKey('quiz_content.id'), nullable=False)
     question = Column(Text, nullable=False)
 
     quiz_content = relationship('QuizContent', back_populates='quiz_questions')
     options = relationship('QuizOption', back_populates='quiz_question')
+    __table_args__ = (
+        UniqueConstraint('lesson_id', 'question', name='_lesson_question_uc'),
+        UniqueConstraint('quiz_id', 'question', name='_quizid_question_uc'),
+    )
 
 
 class QuizOption(Base, TimestampMixin):

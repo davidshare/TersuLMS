@@ -89,6 +89,7 @@ class QuizQuestionCreate(BaseModel):
     This class inherits from BaseModel.
     """
     quiz_id: Optional[int] = None
+    lesson_id: Optional[int] = None
     question: str
     options: List[QuizOptionBase]
 
