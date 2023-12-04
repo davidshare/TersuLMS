@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from .schemas import LessonCreate
+from .schemas import FileContentUpdate, LessonCreate
 from ..exceptions import (
     AlreadyExistsException, DatabaseOperationException,
     NotFoundException, UniqueConstraintViolationException
@@ -48,6 +48,26 @@ class LessonController:
             raise HTTPException(status_code=409, detail=str(e)) from e
         except AlreadyExistsException as e:
             raise HTTPException(status_code=409, detail=str(e)) from e
+        except DatabaseOperationException as e:
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
+
+    @staticmethod
+    def update_file_content(file_content_id: int, file_content: FileContentUpdate):
+        """
+        Handles updating file content
+
+        Args:
+            file_content_id (int): File content id
+            file_content (FileContent): File content data
+
+        Returns:
+            Filecontent: Filecontent object
+        """
+        try:
+            return LessonService.update_file_content(file_content_id, file_content)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
         except DatabaseOperationException as e:
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e

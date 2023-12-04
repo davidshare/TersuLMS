@@ -1,9 +1,12 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from src.course.models import Course
 from src.course_section.models import Section
-from src.exceptions import AlreadyExistsException, DatabaseOperationException, NotFoundException, UniqueConstraintViolationException
+from src.exceptions import (
+    AlreadyExistsException, DatabaseOperationException,
+    NotFoundException, UniqueConstraintViolationException
+)
 from src.lesson.models import ArticleContent, FileContent, Lesson, QuizContent
-from src.lesson.schemas import LessonCreate, QuizContentCreate
+from src.lesson.schemas import LessonCreate
 from ..config.database import get_db
 
 
@@ -29,12 +32,14 @@ class LessonService:
                     f"Section with id {lesson_data.section_id} that belongs to the course with id {lesson_data.course_id} not not found.")
 
             lesson = db.query(Lesson).filter(Lesson.section_id == lesson_data.section_id, Lesson.course_id ==
-                                        lesson_data.course_id, Lesson.ordering == lesson_data.ordering).first()
+                                             lesson_data.course_id, Lesson.ordering == lesson_data.ordering).first()
             if lesson:
                 raise AlreadyExistsException(
                     f"Lesson with ordering {lesson_data.ordering} already exists in section with id {lesson_data.section_id}.")
-            lesson_dict = lesson_data.model_dump(exclude={'file_content', 'quiz_content', 'article_content'})
-            filtered_lesson_data = {key: value for key, value in lesson_dict.items() if value is not None}
+            lesson_dict = lesson_data.model_dump(
+                exclude={'file_content', 'quiz_content', 'article_content'})
+            filtered_lesson_data = {
+                key: value for key, value in lesson_dict.items() if value is not None}
             lesson = Lesson(**filtered_lesson_data)
             db.add(lesson)
             db.flush()
@@ -48,13 +53,12 @@ class LessonService:
                 article_content = ArticleContent(
                     content=lesson_data.article_content.content, lesson_id=lesson.id)
                 db.add(article_content)
-            
+
             elif lesson_data.content_type == "quiz":
                 for question_data in lesson_data.quiz_content.questions:
                     quiz_content = QuizContent(
                         lesson_id=lesson.id, **question_data.model_dump())
                     db.add(quiz_content)
-            
             db.commit()
             db.refresh(lesson)
             return lesson
@@ -145,103 +149,32 @@ class LessonService:
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
-    def create_file_content(lesson_id: int, url: str):
+    def update_file_content(file_content_id: int, file_content: FileContent):
         """
-        Handles creating file content for lessons
-        
+        Handles updating file content
+
         Args:
-            lesson_id (int): Lesson ID
-            url (str): URL to file
-        
+            file_content_id (int): File content id
+            file_content (FileContent): File content data
+
         Returns:
-            Lesson: Lesson object
+            Filecontent: Filecontent object
         """
         try:
             db = next(get_db())
-            lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
-            if not lesson:
+
+            file = db.query(FileContent).filter(FileContent.lesson_id ==
+                                                file_content.lesson_id, FileContent.id == file_content_id).first()
+            if not file:
                 raise NotFoundException(
-                    f"Lesson with id {lesson_id} not found.")
+                    "The file you are trying to update does not exist")
 
-            file_content = FileContent(url=url, lesson_id=lesson_id)
-            db.add(file_content)
-            db.commit()
-            db.refresh(file_content)
-            return lesson
-        except IntegrityError as e:
-            db.rollback()
-            raise AlreadyExistsException(
-                f"File content for lesson with id {lesson_id} already exists.") from e
-        except SQLAlchemyError as e:
-            print(e)
-            raise DatabaseOperationException(str(e)) from e
-
-    @staticmethod
-    def create_article_content(lesson_id: int, content: str):
-        """
-        Handles creating article content for lessons
-        
-        Args:
-            lesson_id (int): Lesson ID
-            content (str): Article content
-        
-        Returns:
-            Lesson: Lesson object
-        """
-        try:
-            db = next(get_db())
-            lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
-            if not lesson:
-                raise NotFoundException(
-                    f"Lesson with id {lesson_id} not found.")
-
-            article_content = ArticleContent(
-                content=content, lesson_id=lesson_id)
-            db.add(article_content)
-            db.commit()
-            db.refresh(article_content)
-            return lesson
-        except IntegrityError as e:
-            db.rollback()
-            raise AlreadyExistsException(
-                f"Article content for lesson with id {lesson_id} already exists.") from e
-        except SQLAlchemyError as e:
-            print(e)
-            raise DatabaseOperationException(str(e)) from e
-
-    @staticmethod
-    def create_quiz_content(quiz_content_data: QuizContentCreate):
-        """
-        Handles creating quiz content for lessons
-
-        Args:
-            quiz_content_data (QuizContentCreate): Quiz content data
-
-        Returns:
-            quiz_content: Quiz content object
-        """
-        try:
-            db = next(get_db())
-            lesson = db.query(Lesson).filter(
-                Lesson.id == quiz_content_data.lesson_id).first()
-            if not lesson:
-                raise NotFoundException(
-                    f"Lesson with id {quiz_content_data.lesson_id} not found.")
-
-            created_quiz_contents = []
-            for question_data in quiz_content_data.questions:
-                quiz_content = QuizContent(
-                    lesson_id=quiz_content_data.lesson_id, **question_data.dict())
-                db.add(quiz_content)
-                db.flush()
-                created_quiz_contents.append(quiz_content)
+            if file_content.url is not None:
+                file.url = file_content.url
 
             db.commit()
-            return created_quiz_contents
-        except IntegrityError as e:
-            db.rollback()
-            raise AlreadyExistsException(
-                f"Quiz content for lesson with id {quiz_content_data.lesson_id} already exists.") from e
+            db.refresh(file)
+            return file
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
