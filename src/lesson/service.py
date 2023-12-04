@@ -6,7 +6,7 @@ from src.exceptions import (
     NotFoundException, UniqueConstraintViolationException
 )
 from src.lesson.models import ArticleContent, FileContent, Lesson, QuizContent
-from src.lesson.schemas import LessonCreate
+from src.lesson.schemas import ArticleContentUpdate, LessonCreate
 from ..config.database import get_db
 
 
@@ -175,6 +175,37 @@ class LessonService:
             db.commit()
             db.refresh(file)
             return file
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+        
+    @staticmethod
+    def update_article_content(article_content_id: int, article_content: ArticleContentUpdate):
+        """
+        Handles updating article content
+
+        Args:
+            article_content_id (int): Article content id
+            article_content (ArticleContent): Article content data
+
+        Returns:
+            ArticleContent: ArticleContent object
+        """
+        try:
+            db = next(get_db())
+
+            article = db.query(ArticleContent).filter(ArticleContent.lesson_id ==
+                                                article_content.lesson_id, ArticleContent.id == article_content_id).first()
+            if not article:
+                raise NotFoundException(
+                    "The article you are trying to update does not exist")
+
+            if article_content.content is not None:
+                article.content = article_content.content
+
+            db.commit()
+            db.refresh(article)
+            return article
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 
 from .controller import LessonController
-from .schemas import FileContentResponse, FileContentUpdate, LessonCreate, LessonResponse, LessonUpdate
+from .schemas import ArticleContentResponse, ArticleContentUpdate, FileContentResponse, FileContentUpdate, LessonCreate, LessonResponse, LessonUpdate
 
 router = APIRouter()
 
@@ -33,6 +33,20 @@ def update_file_content(file_content_id: int, file_content: FileContentUpdate):
         Filecontent: Filecontent object
     """
     return LessonController.update_file_content(file_content_id, file_content)
+
+@router.put("/article-content/id/{article_content_id}", response_model=ArticleContentResponse)
+def update_article_content(article_content_id: int, article_content: ArticleContentUpdate):
+    """
+    Handles updating article content
+
+    Args:
+        article_content_id (int): Article content id
+        article_content (ArticleContent): Article content data
+
+    Returns:
+        ArticleContent: ArticleContent object
+    """
+    return LessonController.update_article_content(article_content_id, article_content)
 
 @router.delete("/id/{lesson_id}")
 def delete_lesson(lesson_id: int):
