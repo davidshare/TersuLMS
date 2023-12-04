@@ -178,7 +178,7 @@ class LessonService:
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
-        
+
     @staticmethod
     def update_article_content(article_content_id: int, article_content: ArticleContentUpdate):
         """
@@ -195,7 +195,7 @@ class LessonService:
             db = next(get_db())
 
             article = db.query(ArticleContent).filter(ArticleContent.lesson_id ==
-                                                article_content.lesson_id, ArticleContent.id == article_content_id).first()
+                                                      article_content.lesson_id, ArticleContent.id == article_content_id).first()
             if not article:
                 raise NotFoundException(
                     "The article you are trying to update does not exist")
@@ -206,6 +206,52 @@ class LessonService:
             db.commit()
             db.refresh(article)
             return article
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+        
+    @staticmethod
+    def update_quiz_content(quiz_content_id: int, quiz_content: QuizContent):
+        """
+        Handles updating quiz content
+
+        Args:
+            quiz_content_id (int): Quiz content id
+            quiz_content (QuizContent): Quiz content data
+
+        Returns:
+            QuizContent: QuizContent object
+        """
+        try:
+            db = next(get_db())
+
+            question = db.query(QuizContent).filter(QuizContent.lesson_id ==
+                                                    quiz_content.lesson_id, QuizContent.id == quiz_content_id).first()
+            if not question:
+                raise NotFoundException(
+                    "The question you are trying to update does not exist")
+
+            if quiz_content.question is not None:
+                question.question = quiz_content.question
+
+            if quiz_content.answer is not None:
+                question.answer = quiz_content.answer
+
+            if quiz_content.option_1 is not None:
+                question.option_1 = quiz_content.option_1
+
+            if quiz_content.option_2 is not None:
+                question.option_2 = quiz_content.option_2
+
+            if quiz_content.option_3 is not None:
+                question.option_3 = quiz_content.option_3
+
+            if quiz_content.option_4 is not None:
+                question.option_4 = quiz_content.option_4
+
+            db.commit()
+            db.refresh(question)
+            return question
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e

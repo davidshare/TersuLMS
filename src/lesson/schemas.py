@@ -108,7 +108,6 @@ class QuizContentUpdate(BaseModel, TimestampMixin):
         content (str): Quiz content
     """
     lesson_id: Optional[int]
-    quiz_id: Optional[int]
     question: Optional[str]
     option_1: Optional[str]
     option_2: Optional[str]
@@ -128,7 +127,6 @@ class QuizContentResponse(BaseModel, TimestampMixin):
     """
     id: int
     lesson_id: int
-    quiz_id: int
     question: str
     option_1: str
     option_2: str
