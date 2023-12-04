@@ -7,4 +7,3 @@ from .course_category.models import *
 from .course.models import *
 from .course_section.models import *
 from .lesson.models import *
-from .lesson_content.models import *
