@@ -187,17 +187,15 @@ class LessonUpdate(BaseModel, TimestampMixin):
         published (bool): Whether lesson is published
             
     """
-    course_id: Optional[int]
-    section_id: Optional[int]
-    title: Optional[str]
-    description: Optional[str]
-    thumbnail_url: Optional[str]
-    content_type: Optional[str]
-    access_type: Optional[str]
-    quiz_attempts_allowed: Optional[int]
-    ordering: Optional[int]
-    duration: Optional[int]
-    published: Optional[bool]
+    section_id: Optional[int] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    thumbnail_url: Optional[str] = None
+    access_type: Optional[str] = None
+    quiz_attempts_allowed: Optional[int] = None
+    ordering: Optional[int] = None
+    duration: Optional[int] = None
+    published: Optional[bool] = None
 
 
 class LessonResponse(BaseModel, TimestampMixin):

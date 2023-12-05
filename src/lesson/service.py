@@ -97,7 +97,7 @@ class LessonService:
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e
-
+        
     @staticmethod
     def update_lesson(lesson_id: int, lesson_data: LessonCreate):
         """Handles updating lessons"""
@@ -109,6 +109,8 @@ class LessonService:
                     f"Lesson with id {lesson_id} not found.")
 
             for key, value in lesson_data.model_dump(exclude_unset=True).items():
+                if key == 'quiz_attempts_allowed' and lesson.content_type != "quiz":
+                    continue
                 if hasattr(lesson, key):
                     setattr(lesson, key, value)
 
