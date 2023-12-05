@@ -1,6 +1,5 @@
+import traceback
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from src import lesson
-from src.course.models import Course
 from src.course_section.models import Section
 from src.exceptions import (
     AlreadyExistsException, DatabaseOperationException,
@@ -35,24 +34,23 @@ class LessonService:
             db.flush()
 
             if lesson_data.content_type in ["video", "pdf"]:
-                LessonService.create_file_content(
+                LessonService.create_file_content(db, 
                     created_lesson.id, lesson_data.file_content)
             elif lesson_data.content_type == "article":
                 LessonService.create_article_content(
-                    created_lesson.id, lesson_data.article_content)
+                    db, created_lesson.id, lesson_data.article_content)
             elif lesson_data.content_type == "quiz":
-                LessonService.create_quiz_content(
+                LessonService.create_quiz_content(db, 
                     created_lesson.id, lesson_data.quiz_content)
-
             db.commit()
-            db.refresh(lesson)
-            return lesson
+            db.refresh(created_lesson)
+            return created_lesson
         except Exception as e:
             db.rollback()
             LessonService.handle_create_lesson_exceptions(e)
 
     @staticmethod
-    def create_file_content(lesson_id: int, file_content: FileContent):
+    def create_file_content(db, lesson_id: int, file_content: FileContent):
         """
         Handles creating file content
 
@@ -62,12 +60,11 @@ class LessonService:
         Returns:
             FileContent: FileContent object
         """
-        db = next(get_db())
         file_content = FileContent(url=file_content.url, lesson_id=lesson_id)
         db.add(file_content)
 
     @staticmethod
-    def create_article_content(lesson_id: int, article_content: ArticleContent):
+    def create_article_content(db, lesson_id: int, article_content: ArticleContent):
         """
         Handles creating article content
 
@@ -77,13 +74,12 @@ class LessonService:
         Returns:
             ArticleContent: ArticleContent object
         """
-        db = next(get_db())
         article_content = ArticleContent(
             content=article_content.content, lesson_id=lesson_id)
         db.add(article_content)
 
     @staticmethod
-    def create_quiz_content(lesson_id: int, quiz_content: QuizContent):
+    def create_quiz_content(db, lesson_id: int, quiz_content: QuizContent):
         """
         Handles creating quiz content
 
@@ -93,11 +89,22 @@ class LessonService:
         Returns:
             QuizContent: QuizContent object
         """
-        db = next(get_db())
-        for question_data in quiz_content.questions:
-            quiz_content = QuizContent(
-                lesson_id=lesson_id, **question_data.model_dump())
-            db.add(quiz_content)
+        try:
+            created_quiz_contents = []
+            for question_data in quiz_content.questions:
+                question = QuizContent(
+                    lesson_id=lesson_id, **question_data.model_dump())
+                db.add(question)
+                created_quiz_contents.append(quiz_content)
+            return created_quiz_contents
+        except IntegrityError as e:
+            print(e)
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+        except Exception as e:
+            print(e)
+            raise e
 
     @staticmethod
     def validate_section(course_id, section_id):
@@ -152,6 +159,7 @@ class LessonService:
             UniqueConstraintViolationException: If a unique constraint is violated
             NotNullViolationException: If a required field is missing or null
         """
+        traceback.print_exc()
         if isinstance(exception, IntegrityError):
             print(exception)
             if "foreign key constraint" in str(exception.orig).lower():
@@ -249,22 +257,6 @@ class LessonService:
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
-    def delete_lesson(lesson_id: int):
-        """Handles deleting lessons"""
-        try:
-            db = next(get_db())
-            lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
-            if not lesson:
-                raise NotFoundException(
-                    f"Lesson with id {lesson_id} not found.")
-            db.delete(lesson)
-            db.commit()
-            return {"message": "Lesson deleted successfully."}
-        except SQLAlchemyError as e:
-            print(e)
-            raise DatabaseOperationException(str(e)) from e
-
-    @staticmethod
     def update_file_content(file_content_id: int, file_content: FileContent):
         """
         Handles updating file content
@@ -353,6 +345,112 @@ class LessonService:
             db.commit()
             db.refresh(question)
             return question
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+
+    @staticmethod
+    def delete_lesson(lesson_id: int):
+        """
+        Handles deleting lessons
+        
+        Args:
+            lesson_id (int): Lesson id
+        
+        Returns:
+            dict: Response message
+        """
+        try:
+            db = next(get_db())
+            found_lesson = db.query(Lesson).filter(
+                Lesson.id == lesson_id).first()
+            if not found_lesson:
+                raise NotFoundException(
+                    f"Lesson with id {lesson_id} not found.")
+            if found_lesson.content_type in ["video", "pdf"]:
+                LessonService.delete_file_content(found_lesson.id)
+            elif found_lesson.content_type == "article":
+                LessonService.delete_article_content(found_lesson.id)
+            elif found_lesson.content_type == "quiz":
+                LessonService.delete_quiz_content(found_lesson.id)
+            db.delete(found_lesson)
+            db.commit()
+            return {"message": "Lesson deleted successfully."}
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+
+    @staticmethod
+    def delete_file_content(lesson_id: int):
+        """
+        Handles deleting file content
+        
+        Args:
+            lesson_id (int): File lesson id
+
+        Returns:
+            dict: Response message
+        """
+        try:
+            db = next(get_db())
+            file = db.query(FileContent).filter(
+                FileContent.lesson_id == lesson_id).first()
+            if not file:
+                raise NotFoundException(
+                    f"File content with lesson_id {lesson_id} not found.")
+            db.delete(file)
+            db.commit()
+            return {"message": "File content deleted successfully."}
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+
+    @staticmethod
+    def delete_article_content(lesson_id: int):
+        """
+        Handles deleting article content
+        
+        Args:
+            lesson_id (int): Article lesson id
+
+        Returns:
+            dict: Response message
+        """
+        try:
+            db = next(get_db())
+            article = db.query(ArticleContent).filter(
+                ArticleContent.lesson_id == lesson_id).first()
+            if not article:
+                raise NotFoundException(
+                    f"Article content with lesson_id {lesson_id} not found.")
+            db.delete(article)
+            db.commit()
+            return {"message": "Article content deleted successfully."}
+        except SQLAlchemyError as e:
+            print(e)
+            raise DatabaseOperationException(str(e)) from e
+
+    @staticmethod
+    def delete_quiz_content(lesson_id: int):
+        """
+        Handles deleting quiz content
+        
+        Args:
+            lesson_id (int): Quiz lesson id
+
+        Returns:
+            dict: Response message
+        """
+        try:
+            db = next(get_db())
+            question = db.query(QuizContent).filter(
+                QuizContent.lesson_id == lesson_id).first()
+            if not question:
+                raise NotFoundException(
+                    f"Quiz content with lesson_id {lesson_id} not found.")
+            db.delete(question)
+            db.commit()
+            return {"message": "Quiz content deleted successfully."}
         except SQLAlchemyError as e:
             print(e)
             raise DatabaseOperationException(str(e)) from e

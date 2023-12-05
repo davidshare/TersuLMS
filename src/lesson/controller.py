@@ -123,4 +123,4 @@ class LessonController:
             raise HTTPException(status_code=404, detail=str(e)) from e
         except DatabaseOperationException as e:
             raise HTTPException(
-                status_code=500, detail="Internal Server Error") from e
+                status_code=500, detail="Internal Server Error") from e    

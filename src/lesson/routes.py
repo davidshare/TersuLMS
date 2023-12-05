@@ -36,30 +36,12 @@ def update_file_content(file_content_id: int, file_content: FileContentUpdate):
 
 @router.put("/article-content/id/{article_content_id}", response_model=ArticleContentResponse)
 def update_article_content(article_content_id: int, article_content: ArticleContentUpdate):
-    """
-    Handles updating article content
-
-    Args:
-        article_content_id (int): Article content id
-        article_content (ArticleContent): Article content data
-
-    Returns:
-        ArticleContent: ArticleContent object
-    """
+    """Handles updating article content"""
     return LessonController.update_article_content(article_content_id, article_content)
 
 @router.put("/quiz-content/id/{quiz_content_id}", response_model=QuizContentResponse)
 def update_quiz_content(quiz_content_id: int, quiz_content: QuizContentUpdate):
-    """
-    Handles updating quiz content
-
-    Args:
-        quiz_content_id (int): Quiz content id
-        quiz_content (QuizContent): Quiz content data
-
-    Returns:
-        QuizContent: QuizContent object
-    """
+    """Handles updating quiz content"""
     return LessonController.update_quiz_content(quiz_content_id, quiz_content)
 
 @router.delete("/id/{lesson_id}")
