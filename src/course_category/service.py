@@ -1,6 +1,6 @@
 from typing import Optional
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-
+from ..logger import logger
 from .models import CourseCategory
 from ..config.database import get_db
 from ..exceptions import (
@@ -23,11 +23,12 @@ class CourseCategoryService:
             db.refresh(course_category)
             return course_category
         except IntegrityError as e:
+            logger.error(e)
             db.rollback()
             raise AlreadyExistsException(
                 f"The course category {name} already exists.") from e
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -38,7 +39,7 @@ class CourseCategoryService:
             course_categories = db.query(CourseCategory).all()
             return course_categories
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -53,7 +54,7 @@ class CourseCategoryService:
                     f"The course category with id {category_id} does not exist.")
             return course_category
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -76,11 +77,12 @@ class CourseCategoryService:
             db.refresh(course_category)
             return course_category
         except IntegrityError as e:
+            logger.error(e)
             db.rollback()
             raise AlreadyExistsException(
                 f"A course category with the name {name} already exists.") from e
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -96,5 +98,5 @@ class CourseCategoryService:
             db.delete(course_category)
             db.commit()
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e

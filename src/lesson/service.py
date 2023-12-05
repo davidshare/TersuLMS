@@ -8,6 +8,7 @@ from src.exceptions import (
 from src.lesson.models import ArticleContent, FileContent, Lesson, QuizContent
 from src.lesson.schemas import ArticleContentUpdate, LessonCreate
 from ..config.database import get_db
+from ..logger import logger
 
 
 class LessonService:
@@ -46,6 +47,7 @@ class LessonService:
             db.refresh(created_lesson)
             return created_lesson
         except Exception as e:
+            logger.error(e)
             db.rollback()
             LessonService.handle_create_lesson_exceptions(e)
 
@@ -97,14 +99,34 @@ class LessonService:
                 db.add(question)
                 created_quiz_contents.append(quiz_content)
             return created_quiz_contents
-        except IntegrityError as e:
-            print(e)
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
+            db.rollback()
             raise DatabaseOperationException(str(e)) from e
-        except Exception as e:
-            print(e)
-            raise e
+        
+    @staticmethod
+    def create_question(lesson_id: int, question_data: QuizContent):
+        """
+        Handles creating a quiz question
+
+        Args:
+            lesson_id (int): Lesson id
+            question_data (QuizContent): Quiz question data
+
+        Returns:
+            QuizContent: QuizContent object
+        """
+        try:
+            db = next(get_db())           
+            
+            question = LessonService.create_quiz_content(db, lesson_id, question_data)
+            db.commit()
+            db.refresh(question)
+            return question
+        except SQLAlchemyError as e:
+            logger.error(e)
+            db.rollback()
+            raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
     def validate_section(course_id, section_id):
@@ -144,6 +166,30 @@ class LessonService:
         if found_lesson:
             raise AlreadyExistsException(
                 f"Lesson with ordering {ordering} already exists in section with id {section_id} that belongs to the course with id {course_id}")
+    
+    @staticmethod
+    def check_quiz_exists(lesson_id: int, question: str):
+        """
+        Checks if a quiz exists in the lesson
+        
+        Args:
+            lesson_id (int): Lesson id
+            question (str): question
+            
+            Raises:
+                AlreadyExistsException: If the question already exists
+        """
+        db = next(get_db())
+        lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
+        if not lesson:
+            raise NotFoundException(
+                f"The quiz with id {lesson_id} you are trying to add a question to does not exist.")
+        
+        existing_questions = db.query(QuizContent).filter(
+            QuizContent.question == question).first()
+        if existing_questions:
+            raise AlreadyExistsException(
+                f"The question {question} already exists in the quiz.")
 
     @staticmethod
     def handle_create_lesson_exceptions(exception):
@@ -217,7 +263,7 @@ class LessonService:
                     f"Lesson with id {lesson_id} not found.")
             return found_lesson
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -240,7 +286,7 @@ class LessonService:
             db.refresh(lesson)
             return lesson
         except IntegrityError as e:
-            print(e)
+            logger.error(e)
             db.rollback()
             error_message = str(e.orig).lower()
             if "foreign key constraint" in error_message:
@@ -253,7 +299,7 @@ class LessonService:
                 raise AlreadyExistsException(
                     f"The lesson {lesson.title} already exists.") from e
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -284,7 +330,7 @@ class LessonService:
             db.refresh(file)
             return file
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -315,7 +361,7 @@ class LessonService:
             db.refresh(article)
             return article
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -346,7 +392,7 @@ class LessonService:
             db.refresh(question)
             return question
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -377,7 +423,7 @@ class LessonService:
             db.commit()
             return {"message": "Lesson deleted successfully."}
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -402,7 +448,7 @@ class LessonService:
             db.commit()
             return {"message": "File content deleted successfully."}
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -427,7 +473,7 @@ class LessonService:
             db.commit()
             return {"message": "Article content deleted successfully."}
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -452,7 +498,7 @@ class LessonService:
             db.commit()
             return {"message": "Quiz content deleted successfully."}
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
 # TODO: Ensure that ordering is reorganized after deleting a lesson

@@ -4,6 +4,7 @@ from src.auth.schemas import UserRoleCreate
 from ..exceptions import AlreadyExistsException, DatabaseOperationException, NotFoundException
 from .models import UserPermissions, UserRole
 from ..config.database import SessionLocal, get_db
+from ..logger import logger
 
 class RoleService:
     """Service class for handling permissions."""
@@ -18,10 +19,12 @@ class RoleService:
                 db.commit()
                 db.refresh(role)
                 return role
-        except IntegrityError as exc:
+        except IntegrityError as e:
+            logger.error(e)
             raise AlreadyExistsException(
-                f"Role {role_name} already exists.") from exc
+                f"Role {role_name} already exists.") from e
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -32,6 +35,7 @@ class RoleService:
                 roles = db.query(UserRole).all()
                 return [{"id": role.id, "role_name": role.role_name} for role in roles]
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e))from e
 
     @staticmethod
@@ -45,6 +49,7 @@ class RoleService:
                     raise NotFoundException("Role not found")
                 return role
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -58,6 +63,7 @@ class RoleService:
                     raise NotFoundException("Role not found")
                 return role
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -74,7 +80,7 @@ class RoleService:
                 else:
                     raise NotFoundException("Role not found")
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -91,6 +97,7 @@ class RoleService:
                 else:
                     raise NotFoundException("Role not found")
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -107,6 +114,7 @@ class RoleService:
                 else:
                     raise NotFoundException("Role not found")
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -123,6 +131,7 @@ class RoleService:
                 else:
                     raise NotFoundException("Role not found")
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -134,14 +143,14 @@ class RoleService:
             db.add(permission)
             db.commit()
             db.refresh(permission)
-            # return {"id": permission.id, "permission_name": permission.permission_name}
             return permission
         except IntegrityError as e:
+            logger.error(e)
             db.rollback()
             raise AlreadyExistsException(
                 f"The permission {permission_name} already exists.") from e
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
         
     @staticmethod
@@ -152,7 +161,7 @@ class RoleService:
             permissions = db.query(UserPermissions).all()
             return permissions
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
         
     @staticmethod
@@ -167,7 +176,7 @@ class RoleService:
                         f"The permission {permission_name} does not exist.")
             return permission
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
         
     @staticmethod
@@ -182,7 +191,7 @@ class RoleService:
                         f"The permission with id {permission_id} does not exist.")
             return permission
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
         
     @staticmethod
@@ -200,11 +209,12 @@ class RoleService:
             db.refresh(permission)
             return permission
         except IntegrityError as e:
+            logger.error(e)
             db.rollback()
             raise AlreadyExistsException(
                 f"The permission {permission_name} already exists.") from e
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
     
     @staticmethod
@@ -222,11 +232,12 @@ class RoleService:
             db.refresh(permission)
             return permission
         except IntegrityError as e:
+            logger.error(e)
             db.rollback()
             raise AlreadyExistsException(
                 f"The permission {new_permission_name} already exists.") from e
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
     
     @staticmethod
@@ -243,7 +254,7 @@ class RoleService:
             db.commit()
             return permission
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
     
     @staticmethod
@@ -260,5 +271,5 @@ class RoleService:
             db.commit()
             return permission
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e

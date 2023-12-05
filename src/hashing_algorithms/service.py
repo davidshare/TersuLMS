@@ -2,6 +2,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from src.config.database import SessionLocal
 from src.exceptions import AlreadyExistsException, DatabaseOperationException, NotFoundException
 from src.hashing_algorithms.model import HashingAlgorithm
+from ..logger import logger
 
 
 class HashingAlgorithmService:
@@ -17,10 +18,12 @@ class HashingAlgorithmService:
                 db.commit()
                 db.refresh(hashing_algorithm)
                 return hashing_algorithm
-        except IntegrityError as exc:
+        except IntegrityError as e:
+            logger.error(e)
             raise AlreadyExistsException(
-                f"Hashing algorithm {algorithm_name.algorithm_name} already exists.") from exc
+                f"Hashing algorithm {algorithm_name.algorithm_name} already exists.") from e
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -34,6 +37,7 @@ class HashingAlgorithmService:
                     raise NotFoundException("Hashing algorithm not found")
                 return algorithm.id
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -43,6 +47,7 @@ class HashingAlgorithmService:
             with SessionLocal() as db:
                 return db.query(HashingAlgorithm).all()
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e))from e
 
     @staticmethod
@@ -56,6 +61,7 @@ class HashingAlgorithmService:
                     raise NotFoundException("Hashing algorithm not found")
                 return algorithm
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -69,6 +75,7 @@ class HashingAlgorithmService:
                     raise NotFoundException("Hashing algorithm not found")
                 return algorithm
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -85,6 +92,7 @@ class HashingAlgorithmService:
                 else:
                     raise NotFoundException("Hashing algorithm not found")
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -101,4 +109,5 @@ class HashingAlgorithmService:
                 else:
                     raise NotFoundException("Hashing algorithm not found")
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e

@@ -14,7 +14,6 @@ class CourseCategoryController:
         except AlreadyExistsException as e:
             raise HTTPException(status_code=409, detail=str(e)) from e
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
 
@@ -24,7 +23,6 @@ class CourseCategoryController:
         try:
             return CourseCategoryService.get_course_categories()
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
 
@@ -36,7 +34,6 @@ class CourseCategoryController:
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=str(e)) from e
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
 
@@ -60,6 +57,5 @@ class CourseCategoryController:
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=str(e)) from e
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e

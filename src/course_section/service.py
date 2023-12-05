@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-
+from ..logger import logger
 from ..exceptions import DatabaseOperationException, NotFoundException
 from ..config.database import get_db
 from .models import Section
@@ -19,7 +19,7 @@ class SectionService:
             db.refresh(section)
             return section
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             db.rollback()
             raise DatabaseOperationException(str(e)) from e
 
@@ -42,7 +42,7 @@ class SectionService:
             db.refresh(section)
             return section
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             db.rollback()
             raise DatabaseOperationException(str(e)) from e
 
@@ -58,6 +58,7 @@ class SectionService:
                     f"Section with id {section_id} not found")
             return section
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
         
     @staticmethod
@@ -72,6 +73,7 @@ class SectionService:
                     f"Section with id {section_id} for course with id {course_id} does not exist.")
             return section
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -83,6 +85,7 @@ class SectionService:
                 Section.course_id == course_id).all()
             return sections
         except SQLAlchemyError as e:
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -99,6 +102,7 @@ class SectionService:
             db.delete(section)
             db.commit()
         except SQLAlchemyError as e:
+            logger.error(e)
             db.rollback()
             raise DatabaseOperationException(str(e)) from e
         

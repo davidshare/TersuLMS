@@ -16,7 +16,6 @@ class RoleController:
         except AlreadyExistsException as e:
             raise HTTPException(status_code=409, detail=str(e)) from e
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
     
@@ -27,7 +26,6 @@ class RoleController:
         except AlreadyExistsException as e:
             raise HTTPException(status_code=409, detail=str(e)) from e
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
 
@@ -112,7 +110,6 @@ class RoleController:
         try:
             return RoleService.get_permissions()
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
         
@@ -124,7 +121,6 @@ class RoleController:
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=str(e)) from e
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
         
@@ -136,7 +132,6 @@ class RoleController:
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=str(e)) from e
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
     
@@ -148,7 +143,6 @@ class RoleController:
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=str(e)) from e            
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
         
@@ -160,7 +154,6 @@ class RoleController:
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=str(e)) from e            
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
     
@@ -172,7 +165,6 @@ class RoleController:
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=str(e)) from e            
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
 
@@ -184,7 +176,6 @@ class RoleController:
         except NotFoundException as e:
             raise HTTPException(status_code=404, detail=str(e)) from e            
         except DatabaseOperationException as e:
-            print(e)
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
         

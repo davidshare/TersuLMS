@@ -1,5 +1,7 @@
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
+from ..logger import logger
+
 from .models import Course
 from .schemas import CourseCreate
 from ..exceptions import AlreadyExistsException, DatabaseOperationException, NotFoundException
@@ -22,11 +24,12 @@ class CourseService:
             db.refresh(course)
             return course
         except IntegrityError as e:
+            logger.error(e)
             db.rollback()
             raise AlreadyExistsException(
                 f"The slug {course_data.slug} already exists.") from e
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -42,7 +45,7 @@ class CourseService:
                     f"Course with slug {slug} does not exist.")
             return course
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -58,7 +61,7 @@ class CourseService:
                     f"Course with id {course_id} does not exist.")
             return course
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -71,7 +74,7 @@ class CourseService:
             courses = db.query(Course).all()
             return courses
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
 
     @staticmethod
@@ -92,11 +95,11 @@ class CourseService:
             db.refresh(course)
             return course
         except IntegrityError as e:
-            print(e)
+            logger.error(e)
             db.rollback()
             raise AlreadyExistsException(f"Conflict in updating course {course_id}.") from e
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
         
     @staticmethod
@@ -111,8 +114,5 @@ class CourseService:
             db.delete(course)
             db.commit()
         except SQLAlchemyError as e:
-            print(e)
+            logger.error(e)
             raise DatabaseOperationException(str(e)) from e
-        
-#TODO: Add proper logging
-
