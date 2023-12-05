@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from .schemas import ArticleContentUpdate, FileContentUpdate, LessonCreate, QuizContentUpdate
 from ..exceptions import (
     AlreadyExistsException, DatabaseOperationException,
-    NotFoundException, UniqueConstraintViolationException
+    NotFoundException, NotNullViolationException, UniqueConstraintViolationException
 )
 from .service import LessonService
 
@@ -21,6 +21,8 @@ class LessonController:
         except UniqueConstraintViolationException as e:
             raise HTTPException(status_code=409, detail=str(e)) from e
         except AlreadyExistsException as e:
+            raise HTTPException(status_code=409, detail=str(e)) from e
+        except NotNullViolationException as e:
             raise HTTPException(status_code=409, detail=str(e)) from e
         except DatabaseOperationException as e:
             raise HTTPException(

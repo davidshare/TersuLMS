@@ -61,3 +61,9 @@ class DuplicateQuestionException(ApplicationException):
 
     def __init__(self, message: str = "Duplicate question found in quiz."):
         super().__init__(message)
+
+class NotNullViolationException(ApplicationException):
+    """Raised when a not null constraint is violated."""
+
+    def __init__(self, message: str = "Not null constraint violated."):
+        super().__init__(message)
