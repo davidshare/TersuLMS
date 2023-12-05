@@ -107,13 +107,13 @@ class QuizContentUpdate(BaseModel, TimestampMixin):
         lesson_id (int): Foreign key to lesson
         content (str): Quiz content
     """
-    lesson_id: Optional[int]
-    question: Optional[str]
-    option_1: Optional[str]
-    option_2: Optional[str]
-    option_3: Optional[str]
-    option_4: Optional[str]
-    answer: Optional[str]
+    lesson_id: Optional[int] = None
+    question: Optional[str] = None
+    option_1: Optional[str] = None
+    option_2: Optional[str] = None
+    option_3: Optional[str] = None
+    option_4: Optional[str] = None
+    answer: Optional[str] = None
 
 
 class QuizContentResponse(BaseModel, TimestampMixin):
