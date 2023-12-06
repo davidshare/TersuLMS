@@ -42,3 +42,6 @@ Content-Type: application/json
     "title": "Section 5",
     "description": "Section 5 description"
 }
+
+### Delete a course section
+DELETE {{host}}/api/v1/sections/25

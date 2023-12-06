@@ -1,9 +1,9 @@
-from re import A
 from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
-from src import course_section
-
 from src.course.models import Course
+
+from ..helpers.db_helpers import reorder_items
+
 
 from ..logger import logger
 from ..exceptions import AlreadyExistsException, DatabaseOperationException, NotFoundException
@@ -111,7 +111,10 @@ class SectionService:
 
     @staticmethod
     def delete_section(section_id):
-        """Deletes a specific course section."""
+        """
+        Deletes a specific course section.
+        
+        """
         try:
             db = next(get_db())
             section = db.query(Section).filter(
@@ -121,7 +124,10 @@ class SectionService:
                     f"Section with id {section_id} not found")
 
             db.delete(section)
-            db.commit()
+            db.flush()
+            reorder_items(Section, Section.course_id == section.course_id, db)
+
+            db.commit()          
         except SQLAlchemyError as e:
             logger.error(e)
             db.rollback()
