@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from src.exceptions import DatabaseOperationException, NotFoundException
+from src.exceptions import AlreadyExistsException, DatabaseOperationException, NotFoundException
 from .service import SectionService
 from .schemas import SectionCreate, SectionUpdate
 
@@ -13,6 +13,12 @@ class SectionController:
         """Controller method to create a new section."""
         try:
             return SectionService.create_section(section_data)
+        except NotFoundException as e:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        except AlreadyExistsException as e:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
         except DatabaseOperationException as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e

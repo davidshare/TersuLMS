@@ -1,0 +1,44 @@
+@host = http://localhost:8000
+
+### Get home url
+GET {{host}}/
+
+### Get all users
+GET {{host}}/api/v1/users
+
+### Get all categories
+GET {{host}}/api/v1/categories
+
+### Post a course
+POST {{host}}/api/v1/courses
+Content-Type: application/json
+
+{
+  "title": "Advanced Techniques in Music Composition",
+  "slug": "advanced-techniques-music-composition",
+  "description": "Dive into advanced aspects of music composition, including intricate harmonies, complex rhythms, and innovative melody construction.",
+  "course_level": "Intermediate",
+  "course_language": "French",
+  "course_duration": 2000,
+  "course_thumbnail": "advanced-music-composition-thumbnail.jpg",
+  "author_id": 1,
+  "course_category_id": 1,
+  "price": 150.0,
+  "published": false
+}
+
+### Get all courses
+GET {{host}}/api/v1/courses
+
+### Get all sections
+GET {{host}}/api/v1/sections/2
+
+### Post create course section
+POST {{host}}/api/v1/sections
+Content-Type: application/json
+
+{
+    "course_id": 2,
+    "title": "Section 5",
+    "description": "Section 5 description"
+}
