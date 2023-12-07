@@ -30,8 +30,8 @@ Content-Type: application/json
 ### Get all courses
 GET {{host}}/api/v1/courses
 
-### Get all sections
-GET {{host}}/api/v1/sections/2
+### Get all sections for a course
+GET {{host}}/api/v1/sections/course/2
 
 ### Post create course section
 POST {{host}}/api/v1/sections
@@ -59,3 +59,27 @@ Content-Type: application/json
 
 ### Delete a course section
 DELETE {{host}}/api/v1/sections/25
+
+### Post create course lesson
+POST {{host}}/api/v1/lessons
+Content-Type: application/json
+
+{
+  "course_id": 2,
+  "section_id": 18,
+  "title": "Advanced Video Editing Techniques",
+  "description": "Dive deep into advanced video editing techniques and explore the use of effects, transitions, and color grading to enhance your videos.",
+  "thumbnail_url": "https://example.com/thumbnails/advanced_video_editing.png",
+  "content_type": "video",
+  "access_type": "paid",
+  "quiz_attempts_allowed": 0,
+  "duration": 1800,
+  "published": true,
+  "file_content": {
+    "url": "https://example.com/videos/advanced_editing_tutorial.mp4"
+  }
+}
+
+
+### Get all lessons
+GET {{host}}/api/v1/lessons/course/1

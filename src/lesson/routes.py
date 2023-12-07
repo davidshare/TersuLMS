@@ -15,6 +15,11 @@ def get_lesson_by_id(lesson_id: int):
     """Handles getting lesson by id"""
     return LessonController.get_lesson_by_id(lesson_id)
 
+@router.get("/course/{course_id}", response_model=list[LessonResponse])
+def get_lessons_by_course_id(course_id: int):
+    """Handles getting lessons by course id"""
+    return LessonController.get_lessons_by_course_id(course_id)
+
 @router.put("/id/{lesson_id}", response_model=LessonResponse)
 def update_lesson(lesson_id: int, lesson_data: LessonUpdate):
     """Handles updating lesson by id"""
@@ -22,16 +27,7 @@ def update_lesson(lesson_id: int, lesson_data: LessonUpdate):
 
 @router.put("/file-content/id/{file_content_id}", response_model=FileContentResponse)
 def update_file_content(file_content_id: int, file_content: FileContentUpdate):
-    """
-    Handles updating file content
-
-    Args:
-        file_content_id (int): File content id
-        file_content (FileContent): File content data
-
-    Returns:
-        Filecontent: Filecontent object
-    """
+    """Handles updating file content"""
     return LessonController.update_file_content(file_content_id, file_content)
 
 @router.put("/article-content/id/{article_content_id}", response_model=ArticleContentResponse)

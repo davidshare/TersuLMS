@@ -38,10 +38,30 @@ class LessonController:
         except DatabaseOperationException as e:
             raise HTTPException(
                 status_code=500, detail="Internal Server Error") from e
+    
+    @staticmethod
+    def get_lessons_by_course_id(course_id: int):
+        """Handles getting lessons by course id"""
+        try:
+            return LessonService.get_lessons_by_course_id(course_id)
+        except NotFoundException as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
+        except DatabaseOperationException as e:
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error") from e
 
     @staticmethod
     def update_lesson(lesson_id: int, lesson_data: LessonCreate):
-        """Handles updating lesson by id"""
+        """
+        Handles updating lesson by id
+
+        Args:
+            lesson_id (int): Lesson id
+            lesson_data (LessonCreate): Lesson data
+
+        Returns:
+            LessonResponse: LessonResponse object
+        """
         try:
             return LessonService.update_lesson(lesson_id, lesson_data)
         except NotFoundException as e:

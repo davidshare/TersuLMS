@@ -148,7 +148,6 @@ class LessonCreate(BaseModel, TimestampMixin):
         content_type (str): Type of content (article, video, quiz, pdf)
         access_type (str): Type of access (free, paid)
         quiz_attempts_allowed (int): Number of attempts allowed for quiz
-        ordering (int): Order of lesson in section
         duration (int): Duration of lesson in seconds
         published (bool): Whether lesson is published
             
@@ -161,7 +160,6 @@ class LessonCreate(BaseModel, TimestampMixin):
     content_type: str
     access_type: str
     quiz_attempts_allowed: Optional[int]
-    ordering: int
     duration: int
     published: bool
     file_content: Optional[FileContentCreate] = None
@@ -193,7 +191,6 @@ class LessonUpdate(BaseModel, TimestampMixin):
     thumbnail_url: Optional[str] = None
     access_type: Optional[str] = None
     quiz_attempts_allowed: Optional[int] = None
-    ordering: Optional[int] = None
     duration: Optional[int] = None
     published: Optional[bool] = None
 
@@ -229,3 +226,25 @@ class LessonResponse(BaseModel, TimestampMixin):
     ordering: int
     duration: int
     published: bool
+
+class LessorOrderUpdate(BaseModel):
+    """
+    Schema for updating the order of course lessons
+
+    Attributes:
+        lesson_id (int): Foreign key to lesson
+        new_order (int): New order of lesson
+    """
+    lesson_id: int
+    new_order: int
+
+class ReorderLessonsRequest(BaseModel):
+    """
+    Schema for reordering course lessons
+
+    Attributes:
+        course_id (int): Foreign key to course
+        updates (List[LessonOrderUpdate]): List of updates
+    """
+    section_id: int
+    updates: List[LessorOrderUpdate]

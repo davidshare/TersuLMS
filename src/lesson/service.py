@@ -1,5 +1,7 @@
 import traceback
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from src.course.models import Course
 from src.course_section.models import Section
 from src.exceptions import (
     AlreadyExistsException, DatabaseOperationException,
@@ -28,21 +30,26 @@ class LessonService:
             db = next(get_db())
             LessonService.validate_section(
                 lesson_data.course_id, lesson_data.section_id)
-            LessonService.check_existing_lesson(
-                lesson_data.course_id, lesson_data.section_id, lesson_data.ordering)
-            created_lesson = LessonService.create_lesson_object(lesson_data)
+            
+            LessonService.check_lesson_exits(lesson_data.section_id, lesson_data.title)
+            
+            max_order = db.query(func.max(Lesson.ordering)).filter(
+                Lesson.section_id == lesson_data.section_id).scalar()
+            new_order = 1 if max_order is None else max_order + 1
+
+            created_lesson = LessonService.create_lesson_object(lesson_data, new_order)
             db.add(created_lesson)
             db.flush()
 
             if lesson_data.content_type in ["video", "pdf"]:
-                LessonService.create_file_content(db, 
-                    created_lesson.id, lesson_data.file_content)
+                LessonService.create_file_content(db,
+                                                  created_lesson.id, lesson_data.file_content)
             elif lesson_data.content_type == "article":
                 LessonService.create_article_content(
                     db, created_lesson.id, lesson_data.article_content)
             elif lesson_data.content_type == "quiz":
-                LessonService.create_quiz_content(db, 
-                    created_lesson.id, lesson_data.quiz_content)
+                LessonService.create_quiz_content(db,
+                                                  created_lesson.id, lesson_data.quiz_content)
             db.commit()
             db.refresh(created_lesson)
             return created_lesson
@@ -103,7 +110,7 @@ class LessonService:
             logger.error(e)
             db.rollback()
             raise DatabaseOperationException(str(e)) from e
-        
+
     @staticmethod
     def create_question(lesson_id: int, question_data: QuizContent):
         """
@@ -117,9 +124,10 @@ class LessonService:
             QuizContent: QuizContent object
         """
         try:
-            db = next(get_db())           
-            
-            question = LessonService.create_quiz_content(db, lesson_id, question_data)
+            db = next(get_db())
+
+            question = LessonService.create_quiz_content(
+                db, lesson_id, question_data)
             db.commit()
             db.refresh(question)
             return question
@@ -146,27 +154,26 @@ class LessonService:
         if not section:
             raise NotFoundException(
                 f"Section with id {section_id} that belongs to the course with id {course_id} not found.")
-
+    
     @staticmethod
-    def check_existing_lesson(course_id: int, section_id: int,  ordering: int):
+    def check_lesson_exits(section_id, title):
         """
-        Checks if a lesson already exists in the section with the given ordering
+        Checks if a lesson exists in the section
         
         Args:
             section_id (int): Section id
-            course_id (int): Course id
-            ordering (int): Lesson ordering
+            title (str): Lesson title
             
             Raises:
                 AlreadyExistsException: If the lesson already exists
         """
         db = next(get_db())
-        found_lesson = db.query(Lesson).filter(Lesson.course_id == course_id,
-                                               Lesson.section_id == section_id, Lesson.ordering == ordering).first()
-        if found_lesson:
+        lesson = db.query(Lesson).filter(
+            Lesson.section_id == section_id, Lesson.title == title).first()
+        if lesson:
             raise AlreadyExistsException(
-                f"Lesson with ordering {ordering} already exists in section with id {section_id} that belongs to the course with id {course_id}")
-    
+                f"The lesson with title {title} already exists in the section.")
+
     @staticmethod
     def check_quiz_exists(lesson_id: int, question: str):
         """
@@ -184,7 +191,7 @@ class LessonService:
         if not lesson:
             raise NotFoundException(
                 f"The quiz with id {lesson_id} you are trying to add a question to does not exist.")
-        
+
         existing_questions = db.query(QuizContent).filter(
             QuizContent.question == question).first()
         if existing_questions:
@@ -233,7 +240,7 @@ class LessonService:
             raise exception
 
     @staticmethod
-    def create_lesson_object(lesson_data: LessonCreate):
+    def create_lesson_object(lesson_data: LessonCreate, ordering):
         """
         Creates a lesson object
         
@@ -249,7 +256,7 @@ class LessonService:
             lesson_dict['quiz_attempts_allowed'] = 0
         filtered_lesson_data = {
             key: value for key, value in lesson_dict.items() if value is not None}
-        return Lesson(**filtered_lesson_data)
+        return Lesson(ordering=ordering, **filtered_lesson_data)
 
     @staticmethod
     def get_lesson_by_id(lesson_id: int):
@@ -262,6 +269,21 @@ class LessonService:
                 raise NotFoundException(
                     f"Lesson with id {lesson_id} not found.")
             return found_lesson
+        except SQLAlchemyError as e:
+            logger.error(e)
+            raise DatabaseOperationException(str(e)) from e
+        
+    @staticmethod
+    def get_lessons_by_course_id(course_id: int):
+        """Handles getting lessons by course id"""
+        try:
+            db = next(get_db())
+            course = db.query(Course).filter(Course.id == course_id).first()
+            if not course:
+                raise NotFoundException(f"The course with id {course_id} does not exist.")
+            
+            lessons = db.query(Lesson).filter(Lesson.course_id == course_id).all()
+            return lessons
         except SQLAlchemyError as e:
             logger.error(e)
             raise DatabaseOperationException(str(e)) from e
