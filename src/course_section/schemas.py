@@ -1,3 +1,4 @@
+from typing import List
 from typing import Optional
 from pydantic import BaseModel
 
@@ -26,4 +27,14 @@ class SectionResponse(SectionBase, TimestampMixin):
 
     class Config:
         """Config for orm_mode"""
-        orm_mode = True
+        from_attributes = True
+
+class SectionOrderUpdate(BaseModel):
+    """Schema for updating the order of course sections"""
+    section_id: int
+    new_order: int
+
+class ReorderSectionsRequest(BaseModel):
+    """Schema for reordering course sections"""
+    course_id: int
+    updates: List[SectionOrderUpdate]

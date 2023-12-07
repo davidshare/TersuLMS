@@ -80,3 +80,16 @@ class SectionController:
         except DatabaseOperationException as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e
+        
+    @staticmethod
+    def reorder_sections(course_id: int, updates: list):
+        """Controller method to reorder sections."""
+        try:
+            SectionService.reorder_sections(course_id, updates)
+            return {"detail": "Sections reordered successfully."}
+        except NotFoundException as e:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+        except DatabaseOperationException as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) from e

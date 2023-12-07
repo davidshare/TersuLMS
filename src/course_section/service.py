@@ -127,11 +127,48 @@ class SectionService:
             db.flush()
             reorder_items(Section, Section.course_id == section.course_id, db)
 
-            db.commit()          
+            db.commit()
         except SQLAlchemyError as e:
             logger.error(e)
             db.rollback()
             raise DatabaseOperationException(str(e)) from e
 
+    @staticmethod
+    def reorder_sections(course_id, updates):
+        """
+        Reorders course sections.
+        
+        Args:
+            course_id: The ID of the course to reorder sections for.
+            updates: A list of tuples with section IDs and their new order.
+        """
+        try:
+            db = next(get_db())
+            sections = db.query(Section).filter(
+                Section.course_id == course_id).all()
+            if not sections:
+                raise NotFoundException(
+                    f"Sections for course with id {course_id} not found")
 
-# TODO: Handle ordering of sections during update or deletion
+            section_dict = {getattr(section, 'id')
+                                    : section for section in sections}
+
+            for section_id, section in section_dict.items():
+                print(
+                    f"Section ID: {section_id}, Title: {section.title}, Ordering: {section.ordering}")
+
+            for update in updates:
+                section_id = update.section_id
+                new_order = update.new_order
+                section = section_dict.get(section_id)
+                if section:
+                    section.ordering = new_order
+                    print(
+                        f"Updating section {section_id} to order {new_order}")
+                    db.add(section)
+            db.commit()
+
+        except SQLAlchemyError as e:
+            logger.error(e)
+            db.rollback()
+            raise DatabaseOperationException(str(e)) from e

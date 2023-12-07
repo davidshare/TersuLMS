@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from .controller import SectionController
-from .schemas import SectionCreate, SectionUpdate, SectionResponse
+from .schemas import ReorderSectionsRequest, SectionCreate, SectionUpdate, SectionResponse
 
 router = APIRouter()
 
@@ -10,6 +10,10 @@ def create_section(section: SectionCreate):
     """API endpoint to create a new section."""
     return SectionController.create_section(section)
 
+@router.put("/reorder", status_code=status.HTTP_200_OK)
+def reorder_sections(reorder_request: ReorderSectionsRequest):
+    """API endpoint to reorder sections."""
+    return SectionController.reorder_sections(reorder_request.course_id, reorder_request.updates)
 
 @router.get("/id/{section_id}", status_code=status.HTTP_200_OK, response_model=SectionResponse)
 def get_section(section_id: int):
@@ -20,7 +24,6 @@ def get_section(section_id: int):
 def get_section_by_course_section(section_id: int, course_id: int):
     """API endpoint to get a section by id."""
     return SectionController.get_section_by_course_id(section_id, course_id)
-
 
 @router.get("/{course_id}", status_code=status.HTTP_200_OK, response_model=list[SectionResponse])
 def get_sections(course_id: int):

@@ -43,5 +43,19 @@ Content-Type: application/json
     "description": "Section 5 description"
 }
 
+### Put update section orders
+PUT {{host}}/api/v1/sections/reorder
+Content-Type: application/json
+
+{
+  "course_id": 2,
+  "updates": [
+    {"section_id": 26, "new_order": 1},
+    {"section_id": 27, "new_order": 2},
+    {"section_id": 24, "new_order": 3},
+    {"section_id": 18, "new_order": 4}
+  ]
+}
+
 ### Delete a course section
 DELETE {{host}}/api/v1/sections/25
